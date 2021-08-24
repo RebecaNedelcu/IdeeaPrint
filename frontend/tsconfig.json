@@ -1,0 +1,10 @@
+{
+  "extends": "@quasar/app/tsconfig-preset",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "typeRoots": [
+    "./typings",
+    "./node_modules/@types/"
+  ]
+}
