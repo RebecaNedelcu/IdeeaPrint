@@ -16,10 +16,10 @@ export async function useApi<T>({
   method = "GET",
   body = {},
   publicRoute = false,
-}: apiInterface): Promise<{ data: T; error: string; ok: boolean; }> {
+}: apiInterface): Promise<{ data: T; error: { detail: string }; ok: boolean }> {
   const apiResponse = {
-    error: "",
-    data: Object(),
+    error: { detail: "" },
+    data: {} as T,
     ok: Boolean(),
   };
 
@@ -60,6 +60,7 @@ export async function useApi<T>({
         } else {
           apiResponse.error = await response.json();
         }
+        console.log(apiResponse.data);
       }
     } catch (error) {
       console.log("fetch err: ", error);

@@ -1,4 +1,3 @@
-
 <template>
   <q-layout view="hHr lpR ffr">
     <q-header class="bg-primary text-secondary" height-hint="98">
@@ -48,8 +47,12 @@
           <q-list class="items">
             <q-item>
               <q-item-section class="text-secondary non-selectable">
-                You're not logged in</q-item-section
-              >
+                {{
+                  userState.user.isLoggedIn
+                    ? `${userState.user.firstName} ${userState.user.lastName}`
+                    : "You're not logged in"
+                }}
+              </q-item-section>
             </q-item>
             <q-separator />
             <q-item
@@ -205,12 +208,11 @@
   </q-layout>
 </template>
 
-
 <script lang="ts">
-import { useQuasar } from "quasar";
 import { defineComponent, ref } from "vue";
 import CartItemComponent from "../components/CartItemComponent.vue";
 import { CartProduct } from "../components/models";
+import { useUser } from "../lib/useUser";
 
 export default defineComponent({
   name: "MainLayout",
@@ -218,6 +220,7 @@ export default defineComponent({
   components: { CartItemComponent },
 
   setup() {
+    const { state: userState } = useUser();
     const cartProducts = ref<CartProduct[]>([
       {
         id: 1,
@@ -235,14 +238,15 @@ export default defineComponent({
         size: "M",
         quantity: 3,
       },
-      
     ]);
     const rightDrawerOpen = ref(false);
+    const discountCode = ref("");
     return {
       CartItemComponent,
       cartProducts,
-      discountCode: ref(""),
+      discountCode,
       rightDrawerOpen,
+      userState,
       toggleRightDrawer() {
         rightDrawerOpen.value = !rightDrawerOpen.value;
       },

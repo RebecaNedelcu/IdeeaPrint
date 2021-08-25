@@ -39,13 +39,12 @@ def login(request):
 
     user = User.objects.filter(email=email).first()
     if(user is None):
-        raise exceptions.AuthenticationFailed('Wrong username/password') #Change to invalid credentials
+        raise exceptions.AuthenticationFailed('Wrong email/password') #Change to invalid credentials
     if (not user.check_password(password)):
-        raise exceptions.AuthenticationFailed('Wrong username/password')
+        raise exceptions.AuthenticationFailed('Wrong email/password')
 
     serialized_user = UserSerializer(user).data
 
-    user.token_version = user.token_version + 1
     user.save()
 
     access_token, access_token_lifetime = generate_access_token(user)
@@ -57,11 +56,11 @@ def login(request):
     }
 
     if settings.DEBUG:
-        set_refresh_token(user, user.token_version, response)
-        refresh_token = generate_refresh_token(user, user.token_version)
+        set_refresh_token(user, response)
+        refresh_token = generate_refresh_token(user)
         response.data['refresh_token'] = refresh_token
     else:
-        set_refresh_token(user, user.token_version, response)
+        set_refresh_token(user, response)
 
     return response
 
@@ -102,9 +101,6 @@ def refresh_token(request):
     if not user.is_active:
         raise exceptions.AuthenticationFailed('Inactive account')
 
-    if payload['token_version'] != user.token_version:
-        raise exceptions.AuthenticationFailed('Invalid Token')
-
     access_token, access_token_lifetime = generate_access_token(user)
 
     response.data = {
@@ -114,11 +110,11 @@ def refresh_token(request):
     }
 
     if settings.DEBUG:
-        set_refresh_token(user, user.token_version, response)
-        refresh_token = generate_refresh_token(user, user.token_version)
+        set_refresh_token(user, response)
+        refresh_token = generate_refresh_token(user)
         response.data['refresh_token'] = refresh_token
     else:
-        set_refresh_token(user, user.token_version, response)
+        set_refresh_token(user, response)
 
     return response
 

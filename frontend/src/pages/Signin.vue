@@ -47,6 +47,7 @@
           bttns-home
           marginBtn
         "
+        @click="onLoginClick"
       />
       <q-btn
         no-caps
@@ -68,16 +69,43 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useUser } from "../lib/useUser";
+import { showToast } from "../lib/useToast";
+import { useQuasar } from "quasar";
+import {useRouter} from 'vue-router'
 
 export default defineComponent({
   name: "PageSignIn",
   components: {},
-  setup() {
+  setup(props) {
+    const email = ref("");
+    const password = ref("");
+    const isPwd = ref(true);
+    const teal = ref(true);
+
+    const { login } = useUser();
+    const router = useRouter();
+
+    const onLoginClick = async () => {
+      try {
+        const { error } = await login(email.value, password.value);
+        if (error) {
+          showToast({ type: "negative", message: error });
+          return;
+        }
+        showToast({type: 'positive', message: 'Logged in'})
+        router.push('/')
+      } catch (error) {
+        showToast({ type: "negative", message: error });
+      }
+    };
+
     return {
-      email: ref(""),
-      password: ref(""),
-      isPwd: ref(true),
-      teal: ref(true),
+      email,
+      password,
+      isPwd,
+      teal,
+      onLoginClick,
       qpageMinHeight() {
         return { minHeight: "1vh" };
       },

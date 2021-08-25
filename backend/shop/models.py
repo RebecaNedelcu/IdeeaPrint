@@ -1,7 +1,10 @@
+from colorfield.fields import ColorField
 from django.db import models
 from django.db.models.aggregates import Max
+from django.contrib.auth.models import User
+
 from .constants import PRODUCT_SEX_TYPE, PRODUCT_SIZES, PRODUCT_TYPES
-from colorfield.fields import ColorField
+
 
 # Create your models here.
 class Illustration(models.Model):
@@ -47,3 +50,11 @@ class ProductImages(models.Model):
     class Meta:
         verbose_name = 'Product Image'
         verbose_name_plural = 'Product Images'
+
+
+class Favorite(models.Model):
+    product = models.ForeignKey(ProductDetails, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = [('user',  'product')]
