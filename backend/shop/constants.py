@@ -19,3 +19,14 @@ PRODUCT_SEX_TYPE = (
     ('F', 'Woman'),
     ('U', 'Unisex'),
 )
+
+PAYMENT_TYPES = (
+    ('1', 'CARD'),
+    ('2', 'CASH'),
+)
+
+STATUS_TYPES = (
+    ('1', 'PROCESSING'),
+    ('2', 'RECEIVED'),
+    ('3', 'DELIVERED'),
+)
