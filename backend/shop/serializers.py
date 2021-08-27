@@ -9,6 +9,11 @@ class IllustrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Illustration
         fields = ['image', 'name']
+        
+    def get_image(self, illustration):
+        request = self.context.get('request')
+        image = illustration.image.url
+        return request.build_absolute_uri(image)
 
 
 class ProductSerializer(serializers.ModelSerializer):

@@ -17,7 +17,7 @@ class Illustration(models.Model):
 
 
 class Product(models.Model):
-    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE)
+    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE, related_name='products')
     type = models.CharField(choices=PRODUCT_TYPES, max_length=4)
 
     def __str__(self):
