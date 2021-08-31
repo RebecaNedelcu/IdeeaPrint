@@ -1,5 +1,6 @@
-import { ApiUser } from "./models/User";
+import { Cookies } from "quasar";
 import { reactive } from "vue";
+import { ApiUser } from "./models/User";
 import { LoginResponse, RegisterResponse } from "./types/ApiResponses";
 import { addMinutes, setAccessToken, setExpiresAt } from "./useAccessToken";
 import { useApi } from "./useApi";
@@ -32,13 +33,18 @@ export const useUser = () => {
     return state.user.favoriteProducts.includes(productId);
   };
 
-  const setUser = (user: ApiUser) => {
-    console.log(user);
-
-    state.user.email = user.email;
-    state.user.firstName = user.first_name;
-    state.user.lastName = user.last_name;
-    state.user.isLoggedIn = true;
+  const setUser = (user: ApiUser | undefined) => {
+    if (user) {
+      state.user.email = user.email;
+      state.user.firstName = user.first_name;
+      state.user.lastName = user.last_name;
+      state.user.isLoggedIn = true;
+    } else {
+      state.user.email = "";
+      state.user.firstName = "";
+      state.user.lastName = "";
+      state.user.isLoggedIn = false;
+    }
   };
 
   const login = async (email: string, password: string) => {
@@ -63,6 +69,7 @@ export const useUser = () => {
           if (data.refresh_token) {
             setRefreshToken(data.refresh_token);
           }
+          Cookies.set("access_token", data.access_token);
         }
       }
     } catch (error) {
@@ -96,13 +103,6 @@ export const useUser = () => {
         if (data) {
           console.log(data);
           setUser(data);
-          // setAccessToken(data.access_token);
-          // setExpiresAt(addMinutes(data.access_token_lifetime));
-          // setUser(data.user);
-
-          // if (data.refresh_token) {
-          //   setRefreshToken(data.refresh_token);
-          // }
         }
       }
     } catch (error) {
@@ -111,5 +111,37 @@ export const useUser = () => {
     return { error: "" };
   };
 
-  return { isProductFavorite, login, state, register };
+  const logout = () => {
+    Cookies.remove("access_token");
+    setUser(undefined);
+  };
+
+  const getUserDetails = async () => {
+    try {
+      const { data, error } = await useApi<ApiUser>({ url: "get_user" });
+      if (error.detail === "") setUser(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const toggleFavoriteProduct = (productId: number) => {
+    if (isProductFavorite(productId)) {
+      state.user.favoriteProducts = state.user.favoriteProducts.filter(
+        (id) => id !== productId
+      );
+    } else {
+      state.user.favoriteProducts.push(productId);
+    }
+  };
+
+  return {
+    isProductFavorite,
+    login,
+    state,
+    register,
+    logout,
+    getUserDetails,
+    toggleFavoriteProduct,
+  };
 };

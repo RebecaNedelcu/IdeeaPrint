@@ -55,22 +55,33 @@
               </q-item-section>
             </q-item>
             <q-separator />
-            <q-item
-              clickable
-              @click="tab = 'sign in'"
-              to="/signin"
-              class="text-bold"
-            >
-              <q-item-section>sign in</q-item-section>
-            </q-item>
-            <q-item
-              clickable
-              @click="tab = 'signup'"
-              to="/signup"
-              class="text-bold"
-            >
-              <q-item-section>sign up</q-item-section>
-            </q-item>
+            <div v-if="!userState.user.isLoggedIn">
+              <q-item
+                clickable
+                @click="tab = 'sign in'"
+                to="/signin"
+                class="text-bold"
+              >
+                <q-item-section>sign in</q-item-section>
+              </q-item>
+              <q-item
+                clickable
+                @click="tab = 'signup'"
+                to="/signup"
+                class="text-bold"
+              >
+                <q-item-section>sign up</q-item-section>
+              </q-item>
+            </div>
+            <div v-else>
+               <q-item
+                clickable
+                @click="logout"
+                class="text-bold"
+              >
+                <q-item-section>logout</q-item-section>
+              </q-item>
+            </div>
           </q-list>
         </q-btn-dropdown>
 
@@ -158,9 +169,11 @@
     </q-drawer>
 
     <q-page-container>
-      <keep-alive>
-        <router-view />
-      </keep-alive>
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </q-page-container>
 
     <q-footer class="text-black">
@@ -211,7 +224,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { Cookies } from "quasar";
+import { defineComponent, ref, onMounted } from "vue";
 import CartItemComponent from "../components/CartItemComponent.vue";
 import { CartProduct } from "../components/models";
 import { useUser } from "../lib/useUser";
@@ -222,8 +236,8 @@ export default defineComponent({
   components: { CartItemComponent },
 
   setup() {
-    const { state: userState } = useUser();
-    console.log("user:", userState);
+    const { state: userState, getUserDetails, logout } = useUser();
+
     const cartProducts = ref<CartProduct[]>([
       {
         id: 1,
@@ -242,14 +256,23 @@ export default defineComponent({
         quantity: 3,
       },
     ]);
+
     const rightDrawerOpen = ref(false);
     const discountCode = ref("");
+
+    onMounted(async () => {
+      if (Cookies.has("access_token")) {
+        await getUserDetails();
+      }
+    });
+
     return {
       CartItemComponent,
       cartProducts,
       discountCode,
       rightDrawerOpen,
       userState,
+      logout,
       toggleRightDrawer() {
         rightDrawerOpen.value = !rightDrawerOpen.value;
       },
