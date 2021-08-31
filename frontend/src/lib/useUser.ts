@@ -1,6 +1,6 @@
-import { ApiUser } from './models/User';
+import { ApiUser } from "./models/User";
 import { reactive } from "vue";
-import { LoginResponse } from "./types/ApiResponses";
+import { LoginResponse, RegisterResponse } from "./types/ApiResponses";
 import { addMinutes, setAccessToken, setExpiresAt } from "./useAccessToken";
 import { useApi } from "./useApi";
 import { setRefreshToken } from "./useRefreshToken";
@@ -71,5 +71,45 @@ export const useUser = () => {
     return { error: "" };
   };
 
-  return { isProductFavorite, login, state };
+  const register = async (
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string
+  ) => {
+    try {
+      let { data, error, ok } = await useApi<RegisterResponse>({
+        url: "register/",
+        method: "POST",
+        body: {
+          email: email,
+          username: email,
+          password: password,
+          first_name: firstName,
+          last_name: lastName,
+        },
+        publicRoute: true,
+      });
+      if (!ok) {
+        return { error: error.detail };
+      } else {
+        if (data) {
+          console.log(data);
+          setUser(data);
+          // setAccessToken(data.access_token);
+          // setExpiresAt(addMinutes(data.access_token_lifetime));
+          // setUser(data.user);
+
+          // if (data.refresh_token) {
+          //   setRefreshToken(data.refresh_token);
+          // }
+        }
+      }
+    } catch (error) {
+      console.log("Login err: ", error);
+    }
+    return { error: "" };
+  };
+
+  return { isProductFavorite, login, state, register };
 };

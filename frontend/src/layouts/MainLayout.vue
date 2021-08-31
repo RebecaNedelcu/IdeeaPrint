@@ -158,7 +158,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </q-page-container>
 
     <q-footer class="text-black">
@@ -221,6 +223,7 @@ export default defineComponent({
 
   setup() {
     const { state: userState } = useUser();
+    console.log("user:", userState);
     const cartProducts = ref<CartProduct[]>([
       {
         id: 1,

@@ -4,7 +4,7 @@
       <q-input
         square
         standout="bg-grey-3"
-        v-model="firstname"
+        v-model="firstName"
         placeholder="first name"
         class="borderLabel q-mt-sm"
         :input-style="{ color: '#000000' }"
@@ -12,7 +12,7 @@
       <q-input
         square
         standout="bg-grey-3"
-        v-model="lastname"
+        v-model="lastName"
         placeholder="last name"
         class="borderLabel q-mt-sm"
         :input-style="{ color: '#000000' }"
@@ -44,7 +44,7 @@
       </q-input>
       <q-input
         standout="bg-grey-3 text-black"
-        v-model="repassword"
+        v-model="password2"
         :type="isPwd ? 'password' : 'text'"
         placeholder="confirm password"
         class="borderLabel q-mt-sm"
@@ -63,6 +63,7 @@
       <q-btn
         no-caps
         flat
+        @click="onRegisterClick"
         color="black"
         label="CREATE ACCOUNT"
         class="
@@ -94,17 +95,48 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { showToast } from "../lib/useToast";
+import { useUser } from "../lib/useUser";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "PageSignUp",
   components: {},
   setup() {
+    const { register, login } = useUser();
+    const router = useRouter();
+
+    const firstName = ref("");
+    const lastName = ref("");
+    const email = ref("");
+    const password = ref("");
+    const password2 = ref("");
+
+    const onRegisterClick = async () => {
+      try {
+        const { error } = await register(
+          email.value,
+          password.value,
+          firstName.value,
+          lastName.value
+        );
+        if (error) {
+          showToast({ type: "negative", message: error });
+          return;
+        }
+        await login(email.value, password.value)
+        showToast({ type: "positive", message: "Logged in" });
+        router.push("/");
+      } catch (error) {}
+    };
+
     return {
-      firstname: ref(""),
-      lastname: ref(""),
-      email: ref(""),
-      password: ref(""),
-      repassword: ref(""),
+      onRegisterClick,
+      firstName,
+      lastName,
+      email,
+      password,
+      password2,
       isPwd: ref(true),
       teal: ref(true),
       qpageMinHeight() {

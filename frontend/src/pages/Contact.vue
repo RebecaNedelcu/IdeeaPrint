@@ -1,9 +1,6 @@
 <template>
-  <q-page
-    class="contactPage justify-center items-center"
-    
-  >
-    <div class="contactContainer row justify-center items-center ">
+  <q-page class="contactPage justify-center items-center">
+    <div class="contactContainer row justify-center items-center">
       <div class="inputContact col">
         <p class="text-h2 text-bold">Contact US</p>
         <span class="text-subtitle1 text-weight-bold"
@@ -13,7 +10,7 @@
         <q-input
           square
           standout="bg-grey-3"
-          v-model="Name"
+          v-model="name"
           placeholder="Name"
           class="messageInput q-my-md"
           :input-style="{ color: '#000000' }"
@@ -21,13 +18,13 @@
         <q-input
           square
           standout="bg-grey-3"
-          v-model="Email"
+          v-model="email"
           placeholder="Email"
           class="messageInput q-my-md"
           :input-style="{ color: '#000000' }"
         />
         <q-input
-          v-model="text"
+          v-model="message"
           autogrow
           square
           standout="bg-grey-3"
@@ -49,6 +46,7 @@
             marginBtn
             q-my-md
           "
+          @click="onSendClick"
         />
       </div>
 
@@ -102,14 +100,47 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useContactMessage } from "../lib/useContactMessage";
+import { showToast } from "../lib/useToast";
 
 export default defineComponent({
   name: "PageContact",
   components: {},
   setup() {
+    let name = ref("");
+    let email = ref("");
+    let message = ref("");
+
+    const { sendContactMessage } = useContactMessage();
+    const onSendClick = async () => {
+      if (name.value !== "" && email.value !== "" && message.value !=="") {
+        try {
+          const { error } = await sendContactMessage(
+            name.value,
+            email.value,
+            message.value
+          );
+          if (error) {
+            showToast({ type: "negative", message: error });
+            return;
+          }
+          showToast({ type: "positive", message: "Message sent!" });
+          name.value=""
+          email.value=""
+          message.value=""
+        } catch (error) {
+          showToast({ type: "negative", message: error });
+        }
+      } else {
+          showToast({ type: "negative", message: "Câmp gol!" });
+      }
+    };
+
     return {
-      text: ref(""),
-      
+      name,
+      email,
+      message,
+      onSendClick,
     };
   },
 });
@@ -119,11 +150,10 @@ export default defineComponent({
 .contactPage {
   font-family: raleway;
   background-image: linear-gradient(90deg, white 85%, $info 15%);
-height:85vh;
+  height: 85vh;
 }
-.contactContainer{
-    
-  height: 100%;  
+.contactContainer {
+  height: 100%;
 }
 .messageInput {
   border-style: solid;
