@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ContactMessage, Illustration, Order, OrderProducts, Product, ProductDetails, ProductImages
+from .models import ContactMessage, Illustration, Order, OrderProducts, Product, ProductDetails, ProductIllustration, ProductImages
 
 
 class ProductDetailsInline(admin.TabularInline):
@@ -12,9 +12,9 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductDetailsInline]
 
 
-@admin.register(ProductImages)
-class ProductImagesAdmin(admin.ModelAdmin):
-    pass
+# @admin.register(ProductImages)
+# class ProductImagesAdmin(admin.ModelAdmin):
+#     pass
 
 
 @admin.register(Illustration)
@@ -34,3 +34,9 @@ class OrderProductsAdmin(admin.ModelAdmin):
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(ProductIllustration)
+class ContactMessageAdmin(admin.ModelAdmin):
+    pass
+

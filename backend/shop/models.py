@@ -7,7 +7,25 @@ from django.contrib.auth.models import User
 from .constants import PAYMENT_TYPES, PRODUCT_SEX_TYPE, PRODUCT_SIZES, PRODUCT_TYPES, STATUS_TYPES
 
 
-# Create your models here.
+'''
+    produs -  tricou 
+    culoare
+    pret
+    type
+    
+    details:
+        marime
+        sex
+        cantitate
+
+    Ilustratie
+        tip
+        imagine
+        nume
+
+'''
+
+
 class Illustration(models.Model):
     image = models.ImageField()
     name = models.CharField(max_length=200)
@@ -17,36 +35,45 @@ class Illustration(models.Model):
 
 
 class Product(models.Model):
-    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE, related_name='products')
+    name = models.CharField(max_length=125)
     type = models.CharField(choices=PRODUCT_TYPES, max_length=4)
+    price = models.DecimalField(decimal_places=2, max_digits=8)
+    color = ColorField(default='#000000')
 
     def __str__(self):
-        return f"{self.illustration}"
+        return f"{self.name} - Color {self.color} "
 
 
 class ProductDetails(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    price = models.DecimalField(decimal_places=2, max_digits=8)
-    color = ColorField(default='#000000')
     size = models.CharField(choices=PRODUCT_SIZES, max_length=6)
     sex = models.CharField(choices=PRODUCT_SEX_TYPE, max_length=6)
     quantity = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.product} - Size {self.get_size_display()} - Color {self.color} - Sex {self.sex}"
+        return f"{self.product} - Size {self.get_size_display()}  - Sex {self.sex}"
 
     class Meta:
         verbose_name = 'Product Details'
         verbose_name_plural = 'Product Details'
 
 
-class ProductImages(models.Model):
-    product_details = models.ForeignKey(
-        ProductDetails, on_delete=models.CASCADE, related_name='product_images')
+class ProductIllustration(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE)
     image = models.ImageField()
 
     def __str__(self):
-        return f"{self.product_details} - image"
+        return f"{self.product} - {self.illustration} - image"
+
+
+class ProductImages(models.Model):
+    product_details = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='product_images')
+    image = models.ImageField()
+
+    def __str__(self):
+        return f"{self.product} - image"
 
     class Meta:
         verbose_name = 'Product Image'
@@ -87,14 +114,14 @@ class OrderProducts(models.Model):
 
     def __str__(self):
         return f"{self.product} in {self.order}"
-    
+
     def clean(self):
         previous_quantity = 0
         if self.id is not None:
             previous_quantity = self.__class__.objects.get(pk=self.id).quantity
         if self.quantity > previous_quantity + self.product.quantity:
             raise ValidationError('Stock too low')
-    
+
     def save(self, *args, **kwargs):
         previous_quantity = 0
         if self.id is not None:
