@@ -1,12 +1,7 @@
 <template>
   <q-card flat square class="product-card q-ma-xl" q-hoverable>
     <div class="product-card-container" clickable @click="openDetailsPage">
-      <q-img
-        :src="illustration.image"
-        class="product-img"
-        ratio="1"
-      >
-      </q-img>
+      <q-img :src="illustration.image" class="product-img" ratio="1"> </q-img>
 
       <div class="card-overlay"></div>
     </div>
@@ -16,7 +11,12 @@
       class="fav-btn"
       color="secondary"
       size="md"
-      :icon="favBtnIcon ? 'fas fa-heart' : 'far fa-heart'"
+      :icon="
+        isIllustrationFavorite(illustration.id)
+          ? 'fas fa-heart'
+          : 'far fa-heart'
+      "
+      @click="onHeartClick"
     />
 
     <q-card-section class="q-px-none">
@@ -28,7 +28,7 @@
         </div>
         <div class="col-5 row card-text text-subtitle1 text-bold justify-end">
           <!-- {{ product.price.toString().split('.')[0] }} LEI -->
-          DE LA {{parseInt(illustration.price.toString())}} LEI
+          DE LA {{ parseInt(illustration.price.toString()) }} LEI
         </div>
       </div>
     </q-card-section>
@@ -36,11 +36,11 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType } from "vue";
-// import { useProducts } from "../lib/useProducts";
-import { useUser } from "../lib/useUser";
+import { defineComponent, PropType } from "vue";
 import { Illustration } from "../lib/models/Illustration";
-import {useRoute,useRouter} from "vue-router"
+import { showToast } from "../lib/useToast";
+import { useUser } from "../lib/useUser";
+import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
   name: "ItemCard",
@@ -51,23 +51,30 @@ export default defineComponent({
     },
   },
   setup({ illustration }) {
-    const { isProductFavorite } = useUser();
-    // const favBtnIcon = ref(isProductFavorite(illustration.id));
-    const favBtnIcon = ref(true);
+    const {
+      isIllustrationFavorite,
+      toggleFavoriteIllustrations,
+      state: userState,
+    } = useUser();
     const route = useRoute();
     const router = useRouter();
+
+    const onHeartClick = () => {
+      if (!userState.user.isLoggedIn) {
+        showToast({ type: "negative", message: "You are not logged in!" });
+      } else {
+        toggleFavoriteIllustrations(illustration.id);
+      }
+    };
+
     const openDetailsPage = () => {
-      router.push('/details/'+route.params.id+'/'+illustration.id+'/')
-    }
-    // const addToFav = () => {
-    //   favBtnIcon.value = !favBtnIcon.value;
-      //changePrice(illustration.id);
-    // };
-    //const { changePrice } = useProducts();
+      router.push("/details/" + route.params.id + "/" + illustration.id + "/");
+    };
+
     return {
-      //addToFav,
-      favBtnIcon,
+      onHeartClick,
       openDetailsPage,
+      isIllustrationFavorite,
     };
   },
 });

@@ -153,3 +153,5 @@ def get_user(request):
     response = Response(serialized_user)
     
     return response
+
+
