@@ -1,6 +1,6 @@
 <template>
   <q-card flat square class="product-card q-ma-xl" q-hoverable>
-    <div class="product-card-container">
+    <div class="product-card-container" clickable @click="openDetailsPage">
       <q-img
         :src="illustration.image"
         class="product-img"
@@ -22,13 +22,13 @@
     <q-card-section class="q-px-none">
       <div class="row">
         <div
-          class="col-9 row card-text text-subtitle1 justify-start product-name"
+          class="col-7 row card-text text-subtitle1 justify-start product-name"
         >
           {{ illustration.name }}
         </div>
-        <div class="col-3 row card-text text-subtitle1 text-bold justify-end">
+        <div class="col-5 row card-text text-subtitle1 text-bold justify-end">
           <!-- {{ product.price.toString().split('.')[0] }} LEI -->
-          de la 50LEI
+          DE LA {{parseInt(illustration.price.toString())}} LEI
         </div>
       </div>
     </q-card-section>
@@ -39,7 +39,8 @@
 import { ref, defineComponent, PropType } from "vue";
 // import { useProducts } from "../lib/useProducts";
 import { useUser } from "../lib/useUser";
-import { Illustration } from "./models";
+import { Illustration } from "../lib/models/Illustration";
+import {useRoute,useRouter} from "vue-router"
 
 export default defineComponent({
   name: "ItemCard",
@@ -52,8 +53,12 @@ export default defineComponent({
   setup({ illustration }) {
     const { isProductFavorite } = useUser();
     // const favBtnIcon = ref(isProductFavorite(illustration.id));
-     const favBtnIcon = ref(true);
-
+    const favBtnIcon = ref(true);
+    const route = useRoute();
+    const router = useRouter();
+    const openDetailsPage = () => {
+      router.push('/details/'+route.params.id+'/'+illustration.id+'/')
+    }
     // const addToFav = () => {
     //   favBtnIcon.value = !favBtnIcon.value;
       //changePrice(illustration.id);
@@ -62,6 +67,7 @@ export default defineComponent({
     return {
       //addToFav,
       favBtnIcon,
+      openDetailsPage,
     };
   },
 });

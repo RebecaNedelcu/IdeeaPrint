@@ -3,4 +3,5 @@ export interface Illustration {
     image: string;
     name: string;
     created_at: string;
+    price: number;
 }

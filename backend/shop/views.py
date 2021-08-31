@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.routers import Response
 
 from .models import ContactMessage, Illustration, Product, ProductDetails, Favorite, ProductIllustration
@@ -26,6 +26,7 @@ class FavoriteViewset(viewsets.ModelViewSet):
 
 @api_view(('GET',))
 @permission_classes([])
+@authentication_classes([])
 def illustrations_by_product_type(request, product_type: int):
     illustrations =  Illustration.objects.filter(products_type__type=product_type)
     serialized_illustrations = IllustrationSerializer(illustrations, many=True, context={"request": request})
@@ -48,6 +49,7 @@ def illustrations_by_product_type(request, product_type: int):
 
 @api_view(('GET',))
 @permission_classes([])
+@authentication_classes([])
 def product_illustration_details(request, product_type: int,illustration_id: int):
     products_illustrations = ProductIllustration.objects.filter(product__type=product_type, illustration = illustration_id)
     serialized_illustrations = ProductIllustrationSerializer(products_illustrations, many=True, context={"request": request})

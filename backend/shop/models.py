@@ -11,6 +11,7 @@ class Illustration(models.Model):
     image = models.ImageField()
     name = models.CharField(max_length=200)
     created_at = models.DateField(auto_now=True)
+    price = models.DecimalField(decimal_places=2, max_digits=8)
 
     def __str__(self):
         return f"Illustration - {self.name}"
