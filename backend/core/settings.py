@@ -141,7 +141,10 @@ MEDIA_URL = '/media/'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'accounts.authentication.JWTAuthentication',
+    ),
 }
 
 CORS_ALLOWED_ORIGINS = [

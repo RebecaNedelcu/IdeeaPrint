@@ -4,9 +4,9 @@ from django.conf import settings
 
 
 def generate_access_token(user):
-    access_token_lifetime = 5
+    access_token_lifetime = 1440
     if settings.DEBUG:
-        access_token_lifetime = 200
+        access_token_lifetime = 1440
     
 
     access_token_payload = {

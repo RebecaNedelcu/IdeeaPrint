@@ -17,7 +17,7 @@
       color="secondary"
       size="md"
       :icon="favBtnIcon ? 'fas fa-heart' : 'far fa-heart'"
-      @click="addToFav"
+      @click="toggleFavoriteProduct"
     />
 
     <q-card-section class="q-px-none">
@@ -50,16 +50,16 @@ export default defineComponent({
     },
   },
   setup({ product }) {
-    const { isProductFavorite } = useUser();
+    const { isProductFavorite, toggleFavoriteProduct } = useUser();
     const favBtnIcon = ref(isProductFavorite(product.id));
     const addToFav = () => {
       favBtnIcon.value = !favBtnIcon.value;
-      changePrice(product.id);
+      toggleFavoriteProduct
     };
-    const { changePrice } = useProducts();
     return {
       addToFav,
       favBtnIcon,
+      toggleFavoriteProduct
     };
   },
 });
