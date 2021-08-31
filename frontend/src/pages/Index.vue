@@ -16,7 +16,7 @@
         color="black"
         label="shop"
         class="no-border-radius buttonsBrdr q-my-sm q-py-sm text-bold text-h6"
-        to="/shop"
+        to="/shop/1"
       />
     </div>
   </q-page>

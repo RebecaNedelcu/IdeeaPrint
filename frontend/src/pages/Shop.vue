@@ -47,11 +47,11 @@
                     Hoodies
                   </q-chip>
                   <q-chip
-                    v-model:selected="productType.Canvas"
+                    v-model:selected="productType.Totebags"
                     color="accent"
                     text-color="black"
                   >
-                    Canvas
+                    Totebags
                   </q-chip>
                 </div>
               </div>
@@ -86,7 +86,7 @@
                   color="accent"
                 />
               </div>
-              <div class="q-mb-md">
+              <!-- <div class="q-mb-md">
                 <span class="text-weight-medium">Size:</span>
                 <div>
                   <q-chip
@@ -180,7 +180,7 @@
                   >
                   </q-chip>
                 </div>
-              </div>
+              </div> -->
               <div class="q-mb-md">
                 <span class="text-weight-medium">Price:</span>
                 <div class="q-px-xl q-pt-lg">
@@ -222,9 +222,9 @@
     </div>
     <div class="row items-center justify-center">
       <item-card-component
-        v-for="product in productsState.products"
-        :product="product"
-        :key="product.id"
+        v-for="illustration in illustrations"
+        :illustration="illustration"
+        :key="illustration.id"
         class="col-12 col-md-3"
       />
     </div>
@@ -232,9 +232,18 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, onMounted } from "vue";
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  onMounted,
+  onBeforeUpdate,
+} from "vue";
 import ItemCardComponent from "../components/ItemCardComponent.vue";
-import { useProducts } from "../lib/useProducts";
+import { useShop } from "../lib/useShop";
+import { useRoute } from "vue-router";
+import { Illustration } from "../lib/models/Illustration";
 
 export default defineComponent({
   name: "Shop",
@@ -242,6 +251,8 @@ export default defineComponent({
     ItemCardComponent,
   },
   setup() {
+    const route = useRoute();
+    let illustrations = ref<Illustration[]>();
     type tproductType = {
       [key: string]: boolean;
     };
@@ -249,7 +260,7 @@ export default defineComponent({
       Tshirt: false,
       Mugs: false,
       Hoodies: false,
-      Canvas: false,
+      Totebags: false,
     });
     type tproductSize = {
       [key: string]: boolean;
@@ -275,14 +286,32 @@ export default defineComponent({
       blue: false,
     });
 
-    const { state: productsState, loadProducts } = useProducts();
+    const { state: illustrationsState, loadIllustrations } = useShop();
 
+    onBeforeUpdate(async () => {
+      await loadIllustrations(parseInt(route.params.id.toString()));
+      if (parseInt(route.params.id.toString()) === 1)
+        illustrations.value = illustrationsState.tshirts;
+      else if (parseInt(route.params.id.toString()) === 2)
+        illustrations.value = illustrationsState.hoodies;
+      else if (parseInt(route.params.id.toString()) === 3)
+        illustrations.value = illustrationsState.mugs;
+      else if (parseInt(route.params.id.toString()) === 4)
+        illustrations.value = illustrationsState.totebags;
+    });
     onMounted(async () => {
-      await loadProducts()
-    })
-
+      await loadIllustrations(parseInt(route.params.id.toString()));
+      if (parseInt(route.params.id.toString()) === 1)
+        illustrations.value = illustrationsState.tshirts;
+      else if (parseInt(route.params.id.toString()) === 2)
+        illustrations.value = illustrationsState.hoodies;
+      else if (parseInt(route.params.id.toString()) === 3)
+        illustrations.value = illustrationsState.mugs;
+      else if (parseInt(route.params.id.toString()) === 4)
+        illustrations.value = illustrationsState.totebags;
+    });
     return {
-      productsState,
+      illustrations,
       ItemCardComponent,
       color: ref("cyan"),
       label: ref({

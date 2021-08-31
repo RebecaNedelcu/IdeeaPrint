@@ -4,8 +4,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.routers import Response
 
-from .models import ContactMessage, Illustration, Product, ProductDetails, Favorite
-from .serializers import (ContactMessageSerializer, FavoriteSerializer, IllustrationSerializer, ProductDetailsSerializer,
+from .models import ContactMessage, Illustration, Product, ProductDetails, Favorite, ProductIllustration
+from .serializers import (ContactMessageSerializer, FavoriteSerializer, IllustrationSerializer, ProductDetailsSerializer, ProductIllustrationSerializer,
                           ProductSerializer)
 
 
@@ -33,6 +33,29 @@ def illustrations_by_product_type(request, product_type: int):
     response = Response(data=serialized_illustrations.data)
     
     return response
+
+
+# @api_view(('GET',))
+# @permission_classes([])
+# def illustrations_all(request):
+#     illustrations =  Illustration.objects.prefetch_related('products_type').all()
+#     serialized_illustrations = IllustrationSerializer(illustrations, many=True, context={"request": request})
+    
+#     response = Response(data=serialized_illustrations.data)
+    
+#     return response
+
+
+@api_view(('GET',))
+@permission_classes([])
+def product_illustration_details(request, product_type: int,illustration_id: int):
+    products_illustrations = ProductIllustration.objects.filter(product__type=product_type, illustration = illustration_id)
+    serialized_illustrations = ProductIllustrationSerializer(products_illustrations, many=True, context={"request": request})
+    
+    response = Response(data=serialized_illustrations.data)
+    
+    return response
+
 
 
 @api_view(['POST'])

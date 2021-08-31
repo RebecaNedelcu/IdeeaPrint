@@ -23,15 +23,17 @@
             class="text-weight-bold text-h6 q-px-md"
           >
             <q-list class="items text-bold">
-              <q-item clickable @click="tab = 't-shirts'">
+              <q-item clickable to="/shop/1" active-class="shop-dropdown-button-active">
                 <q-item-section>t-shirts</q-item-section>
               </q-item>
-
-              <q-item clickable @click="tab = 'mugs'">
+              <q-item clickable to="/shop/2" active-class="shop-dropdown-button-active">
+                <q-item-section>hoodies</q-item-section>
+              </q-item>
+              <q-item clickable to="/shop/3" active-class="shop-dropdown-button-active">
                 <q-item-section>mugs</q-item-section>
               </q-item>
-              <q-item clickable @click="tab = 'hoodies'">
-                <q-item-section>hoodies</q-item-section>
+              <q-item clickable to="/shop/4" active-class="shop-dropdown-button-active">
+                <q-item-section>totebags</q-item-section>
               </q-item>
             </q-list>
           </q-btn-dropdown>
@@ -283,5 +285,8 @@ export default defineComponent({
   border-style: solid;
   background-color: $info;
   border-width: 3px;
+}
+.shop-dropdown-button-active{
+  color: $accent;
 }
 </style>

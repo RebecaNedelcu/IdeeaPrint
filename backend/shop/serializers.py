@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
-from .models import ContactMessage, Favorite, Illustration, Product, ProductDetails, ProductImages
+from .models import ContactMessage, Favorite, Illustration, Product, ProductDetails, ProductIllustration, ProductImages
 from accounts.serializers import UserSerializer
 # Serializers define the API representation.
 
@@ -8,7 +8,7 @@ from accounts.serializers import UserSerializer
 class IllustrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Illustration
-        fields = ['image', 'name', 'created_at']
+        fields = ['id','image', 'name', 'created_at']
         
     def get_image(self, illustration):
         request = self.context.get('request')
@@ -17,11 +17,11 @@ class IllustrationSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    illustration = IllustrationSerializer()
+    #illustration = IllustrationSerializer()
 
     class Meta:
         model = Product
-        fields = ['type', 'illustration']
+        fields = ['id','name','type','price','color']
 
 
 class ProductImagesSerializer(serializers.ModelSerializer):
@@ -39,11 +39,13 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'price', 'color', 'size', 'sex', 'quantity', 'product_images']
 
 
-class ContactMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ContactMessage
-        fields = ['id','name','email','message']
+class ProductIllustrationSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    illustration = IllustrationSerializer()
 
+    class Meta:
+        model = ProductIllustration
+        fields = ['id','product','illustration','image']
 
 class FavoriteSerializer(serializers.ModelSerializer):
     illustration = IllustrationSerializer()
@@ -52,3 +54,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = ['id','illustration','user']
+
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = ['id','name','email','message']
