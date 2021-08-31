@@ -12,6 +12,7 @@ const routes: RouteRecordRaw[] = [
        {path: '/details/:productType/:illustrationId', component: () => import('pages/DetailsItem.vue')},
        {path: '/step2', component: () => import('pages/Step2.vue')},
        {path: '/step3', component: () => import('pages/Step3.vue')},
+       {path: '/favorite', component: () => import('pages/Favorite.vue')},
        {path: '/checkout', component: () => import('pages/Checkout.vue')},
        {path: '/profile', component: () => import('pages/Profile.vue')},
       ],

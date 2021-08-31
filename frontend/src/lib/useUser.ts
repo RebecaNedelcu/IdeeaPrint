@@ -1,5 +1,6 @@
 import { Cookies } from "quasar";
 import { reactive } from "vue";
+import { FavoriteIllustrations } from "./models/Illustration";
 import { ApiUser } from "./models/User";
 import { LoginResponse, RegisterResponse } from "./types/ApiResponses";
 import { addMinutes, setAccessToken, setExpiresAt } from "./useAccessToken";
@@ -13,7 +14,7 @@ interface StateType {
     firstName: string;
     lastName: string;
     isLoggedIn: boolean;
-    favoriteProducts: number[];
+    favoriteIllustrations: number[];
   };
 }
 
@@ -24,13 +25,13 @@ const state = reactive<StateType>({
     firstName: "",
     lastName: "",
     isLoggedIn: false,
-    favoriteProducts: [1],
+    favoriteIllustrations: [],
   },
 });
 
 export const useUser = () => {
-  const isProductFavorite = (productId: number) => {
-    return state.user.favoriteProducts.includes(productId);
+  const isIllustrationFavorite = (illustrationId: number) => {
+    return state.user.favoriteIllustrations.includes(illustrationId);
   };
 
   const setUser = (user: ApiUser | undefined) => {
@@ -44,6 +45,32 @@ export const useUser = () => {
       state.user.firstName = "";
       state.user.lastName = "";
       state.user.isLoggedIn = false;
+      state.user.favoriteIllustrations = [];
+    }
+  };
+
+  const getFavoriteIllustrations = async () => {
+    try {
+      const { data } = await useApi<FavoriteIllustrations[]>({
+        url: "shop/get_favorite",
+      });
+
+      data.forEach((il) => {
+        state.user.favoriteIllustrations.push(il.illustration.id);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getFavoriteIllustrationsWithData = async () => {
+    try {
+      const { data } = await useApi<FavoriteIllustrations[]>({
+        url: "shop/get_favorite",
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -70,6 +97,7 @@ export const useUser = () => {
             setRefreshToken(data.refresh_token);
           }
           Cookies.set("access_token", data.access_token);
+          await getFavoriteIllustrations();
         }
       }
     } catch (error) {
@@ -118,30 +146,42 @@ export const useUser = () => {
 
   const getUserDetails = async () => {
     try {
-      const { data, error } = await useApi<ApiUser>({ url: "get_user" });
-      if (error.detail === "") setUser(data);
+      const { data } = await useApi<ApiUser>({ url: "get_user" });
+      setUser(data);
+      await getFavoriteIllustrations();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const toggleFavoriteProduct = (productId: number) => {
-    if (isProductFavorite(productId)) {
-      state.user.favoriteProducts = state.user.favoriteProducts.filter(
-        (id) => id !== productId
-      );
-    } else {
-      state.user.favoriteProducts.push(productId);
+  const toggleFavoriteIllustrations = async (illustrationId: number) => {
+    try {
+      await useApi({
+        url: `shop/toggle_favorite/${illustrationId}`,
+        method: "POST",
+      });
+
+      if (isIllustrationFavorite(illustrationId)) {
+        state.user.favoriteIllustrations =
+          state.user.favoriteIllustrations.filter(
+            (id) => id !== illustrationId
+          );
+      } else {
+        state.user.favoriteIllustrations.push(illustrationId);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   return {
-    isProductFavorite,
+    isIllustrationFavorite,
     login,
     state,
     register,
     logout,
     getUserDetails,
-    toggleFavoriteProduct,
+    toggleFavoriteIllustrations,
+    getFavoriteIllustrationsWithData,
   };
 };

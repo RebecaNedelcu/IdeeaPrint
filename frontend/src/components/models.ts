@@ -1,3 +1,5 @@
+import { deprecate } from "util";
+
 enum ProductType {
   TShirt,
   Hoodie,
