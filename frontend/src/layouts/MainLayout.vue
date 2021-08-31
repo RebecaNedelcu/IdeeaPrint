@@ -23,16 +23,32 @@
             class="text-weight-bold text-h6 q-px-md"
           >
             <q-list class="items text-bold">
-              <q-item clickable to="/shop/1" active-class="shop-dropdown-button-active">
+              <q-item
+                clickable
+                to="/shop/1"
+                active-class="shop-dropdown-button-active"
+              >
                 <q-item-section>t-shirts</q-item-section>
               </q-item>
-              <q-item clickable to="/shop/2" active-class="shop-dropdown-button-active">
+              <q-item
+                clickable
+                to="/shop/2"
+                active-class="shop-dropdown-button-active"
+              >
                 <q-item-section>hoodies</q-item-section>
               </q-item>
-              <q-item clickable to="/shop/3" active-class="shop-dropdown-button-active">
+              <q-item
+                clickable
+                to="/shop/3"
+                active-class="shop-dropdown-button-active"
+              >
                 <q-item-section>mugs</q-item-section>
               </q-item>
-              <q-item clickable to="/shop/4" active-class="shop-dropdown-button-active">
+              <q-item
+                clickable
+                to="/shop/4"
+                active-class="shop-dropdown-button-active"
+              >
                 <q-item-section>totebags</q-item-section>
               </q-item>
             </q-list>
@@ -43,7 +59,14 @@
             contact
           </q-route-tab>
         </q-tabs>
-        <q-btn dense flat round icon="far fa-heart" class="q-mx-sm" />
+        <q-btn
+          dense
+          flat
+          round
+          icon="far fa-heart"
+          class="q-mx-sm"
+          @click="$router.push('/favorite')"
+        />
 
         <q-btn-dropdown no-caps auto-close flat dropdown-icon="far fa-user">
           <q-list class="items">
@@ -76,11 +99,7 @@
               </q-item>
             </div>
             <div v-else>
-               <q-item
-                clickable
-                @click="logout"
-                class="text-bold"
-              >
+              <q-item clickable @click="logout" class="text-bold">
                 <q-item-section>logout</q-item-section>
               </q-item>
             </div>
@@ -171,11 +190,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view v-slot="{ Component }">
-        <keep-alive>
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
+      <router-view> </router-view>
     </q-page-container>
 
     <q-footer class="text-black">
@@ -309,7 +324,7 @@ export default defineComponent({
   background-color: $info;
   border-width: 3px;
 }
-.shop-dropdown-button-active{
+.shop-dropdown-button-active {
   color: $accent;
 }
 </style>
