@@ -1,7 +1,7 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
-from .models import ContactMessage, Illustration, Product, ProductDetails, ProductImages
-
+from .models import ContactMessage, Favorite, Illustration, Product, ProductDetails, ProductImages
+from accounts.serializers import UserSerializer
 # Serializers define the API representation.
 
 
@@ -43,3 +43,12 @@ class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage
         fields = ['id','name','email','message']
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    illustration = IllustrationSerializer()
+    user = UserSerializer()
+
+    class Meta:
+        model = Favorite
+        fields = ['id','illustration','user']

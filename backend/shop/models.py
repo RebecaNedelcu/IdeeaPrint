@@ -54,11 +54,11 @@ class ProductImages(models.Model):
 
 
 class Favorite(models.Model):
-    product = models.ForeignKey(ProductDetails, on_delete=models.CASCADE)
+    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = [('user',  'product')]
+        unique_together = [('user',  'illustration')]
 
 
 class Order(models.Model):
