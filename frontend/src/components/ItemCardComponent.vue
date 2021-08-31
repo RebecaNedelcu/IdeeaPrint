@@ -2,7 +2,7 @@
   <q-card flat square class="product-card q-ma-xl" q-hoverable>
     <div class="product-card-container">
       <q-img
-        :src="product.product_images[0].image"
+        :src="illustration.image"
         class="product-img"
         ratio="1"
       >
@@ -17,7 +17,6 @@
       color="secondary"
       size="md"
       :icon="favBtnIcon ? 'fas fa-heart' : 'far fa-heart'"
-      @click="toggleFavoriteProduct"
     />
 
     <q-card-section class="q-px-none">
@@ -25,10 +24,11 @@
         <div
           class="col-9 row card-text text-subtitle1 justify-start product-name"
         >
-          {{ product.product.illustration.name }}
+          {{ illustration.name }}
         </div>
         <div class="col-3 row card-text text-subtitle1 text-bold justify-end">
-          {{ product.price.toString().split('.')[0] }} LEI
+          <!-- {{ product.price.toString().split('.')[0] }} LEI -->
+          de la 50LEI
         </div>
       </div>
     </q-card-section>
@@ -37,29 +37,31 @@
 
 <script lang="ts">
 import { ref, defineComponent, PropType } from "vue";
-import { useProducts } from "../lib/useProducts";
+// import { useProducts } from "../lib/useProducts";
 import { useUser } from "../lib/useUser";
-import { Product } from "./models";
+import { Illustration } from "./models";
 
 export default defineComponent({
   name: "ItemCard",
   props: {
-    product: {
-      type: Object as PropType<Product>,
+    illustration: {
+      type: Object as PropType<Illustration>,
       required: true,
     },
   },
-  setup({ product }) {
-    const { isProductFavorite, toggleFavoriteProduct } = useUser();
-    const favBtnIcon = ref(isProductFavorite(product.id));
-    const addToFav = () => {
-      favBtnIcon.value = !favBtnIcon.value;
-      toggleFavoriteProduct
-    };
+  setup({ illustration }) {
+    const { isProductFavorite } = useUser();
+    // const favBtnIcon = ref(isProductFavorite(illustration.id));
+     const favBtnIcon = ref(true);
+
+    // const addToFav = () => {
+    //   favBtnIcon.value = !favBtnIcon.value;
+      //changePrice(illustration.id);
+    // };
+    //const { changePrice } = useProducts();
     return {
-      addToFav,
+      //addToFav,
       favBtnIcon,
-      toggleFavoriteProduct
     };
   },
 });
