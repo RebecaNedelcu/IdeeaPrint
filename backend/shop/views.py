@@ -4,8 +4,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.routers import Response
 
-from .models import ContactMessage, Illustration, Product, ProductDetails
-from .serializers import (ContactMessageSerializer, IllustrationSerializer, ProductDetailsSerializer,
+from .models import ContactMessage, Illustration, Product, ProductDetails, Favorite
+from .serializers import (ContactMessageSerializer, FavoriteSerializer, IllustrationSerializer, ProductDetailsSerializer,
                           ProductSerializer)
 
 
@@ -19,9 +19,9 @@ class ProductDetailsViewset(viewsets.ModelViewSet):
     queryset = ProductDetails.objects.all()
 
 
-class ContactMessageViewset(viewsets.ModelViewSet):
-    serializer_class = ContactMessageSerializer
-    queryset = ContactMessage.objects.all()
+class FavoriteViewset(viewsets.ModelViewSet):
+    serializer_class = FavoriteSerializer
+    queryset = Favorite.objects.all()
 
 
 @api_view(('GET',))
@@ -38,11 +38,13 @@ def illustrations_by_product_type(request, product_type: int):
 @api_view(['POST'])
 @permission_classes([])
 def send_contact_message(request):
-    response = Response(status_code=400)
+    response = Response()
     contactMessage = ContactMessage()
     serializer = ContactMessageSerializer(contactMessage, data = request.data)
     if (serializer.is_valid()):
         serializer.save()
-        response.status_code = 200
+        response.status = 200
+    else:
+        response.status = 400
     return response
 
