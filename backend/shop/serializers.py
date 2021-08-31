@@ -8,7 +8,7 @@ from accounts.serializers import UserSerializer
 class IllustrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Illustration
-        fields = ['image', 'name']
+        fields = ['image', 'name', 'created_at']
         
     def get_image(self, illustration):
         request = self.context.get('request')

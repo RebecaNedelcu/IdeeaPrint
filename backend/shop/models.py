@@ -7,31 +7,15 @@ from django.contrib.auth.models import User
 from .constants import PAYMENT_TYPES, PRODUCT_SEX_TYPE, PRODUCT_SIZES, PRODUCT_TYPES, STATUS_TYPES
 
 
-'''
-    produs -  tricou 
-    culoare
-    pret
-    type
-    
-    details:
-        marime
-        sex
-        cantitate
-
-    Ilustratie
-        tip
-        imagine
-        nume
-
-'''
-
-
 class Illustration(models.Model):
     image = models.ImageField()
     name = models.CharField(max_length=200)
+    created_at = models.DateField(auto_now=True)
 
     def __str__(self):
         return f"Illustration - {self.name}"
+
+
 
 
 class Product(models.Model):
@@ -67,6 +51,21 @@ class ProductIllustration(models.Model):
         return f"{self.product} - {self.illustration} - image"
 
 
+    class Meta:
+        unique_together = [('product',  'illustration')]
+        verbose_name = 'Product Illustration'
+        verbose_name_plural = 'Products Illustrations'  
+
+
+class IllustrationProductType(models.Model):
+    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE, related_name='products_type')
+    type = models.CharField(max_length=10, choices=PRODUCT_TYPES)
+
+    def __str__(self):
+        return f"{self.illustration} - {self.get_type_display()}"
+
+
+@DeprecationWarning
 class ProductImages(models.Model):
     product_details = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='product_images')
@@ -83,6 +82,10 @@ class ProductImages(models.Model):
 class Favorite(models.Model):
     illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+
+    def __str__(self):
+        return f"{self.user} - {self.illustration}"
 
     class Meta:
         unique_together = [('user',  'illustration')]

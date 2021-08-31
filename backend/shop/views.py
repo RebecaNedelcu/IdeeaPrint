@@ -27,7 +27,7 @@ class FavoriteViewset(viewsets.ModelViewSet):
 @api_view(('GET',))
 @permission_classes([])
 def illustrations_by_product_type(request, product_type: int):
-    illustrations =  Illustration.objects.filter(products__type=product_type)
+    illustrations =  Illustration.objects.filter(products_type__type=product_type)
     serialized_illustrations = IllustrationSerializer(illustrations, many=True, context={"request": request})
     
     response = Response(data=serialized_illustrations.data)

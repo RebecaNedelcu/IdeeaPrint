@@ -1,17 +1,21 @@
 from django.contrib import admin
-from .models import ContactMessage, Illustration, Order, OrderProducts, Product, ProductDetails, ProductIllustration, ProductImages
+from .models import ContactMessage, Favorite, Illustration, IllustrationProductType, Order, OrderProducts, Product, ProductDetails, ProductIllustration, ProductImages
 
 
 class ProductDetailsInline(admin.TabularInline):
     model = ProductDetails
 
 
+class IllustrationProductTypeInline(admin.TabularInline):
+    model = IllustrationProductType
+    max_num = 4
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductDetailsInline]
 
-
+# @DeprecationWarning
 # @admin.register(ProductImages)
 # class ProductImagesAdmin(admin.ModelAdmin):
 #     pass
@@ -20,6 +24,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Illustration)
 class IllustrationAdmin(admin.ModelAdmin):
     pass
+    inlines = [IllustrationProductTypeInline]
 
 
 @admin.register(Order)
@@ -31,12 +36,17 @@ class OrderAdmin(admin.ModelAdmin):
 class OrderProductsAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(ProductIllustration)
-class ContactMessageAdmin(admin.ModelAdmin):
+class ProductIllustrationAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    pass
