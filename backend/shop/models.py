@@ -107,3 +107,12 @@ class OrderProducts(models.Model):
         unique_together = ('order', 'product')
         verbose_name = 'Order Product'
         verbose_name_plural = 'Orders Products'
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.CharField(max_length=200)
+    message = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return f"Message from {self.name}, {self.email} : {self.message}"

@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
-from .models import Illustration, Product, ProductDetails, ProductImages
+from .models import ContactMessage, Illustration, Product, ProductDetails, ProductImages
 
 # Serializers define the API representation.
 
@@ -38,3 +38,8 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
         model = ProductDetails
         fields = ['id', 'product', 'price', 'color', 'size', 'sex', 'quantity', 'product_images']
 
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = ['id','name','email','message']
