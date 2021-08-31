@@ -1,6 +1,6 @@
 <template>
   <q-card flat square class="product-card q-ma-xl" q-hoverable>
-    <div class="product-card-container">
+    <div class="product-card-container" clickable @click="openDetailsPage">
       <q-img :src="illustration.image" class="product-img" ratio="1"> </q-img>
 
       <div class="card-overlay"></div>
@@ -22,13 +22,13 @@
     <q-card-section class="q-px-none">
       <div class="row">
         <div
-          class="col-9 row card-text text-subtitle1 justify-start product-name"
+          class="col-7 row card-text text-subtitle1 justify-start product-name"
         >
           {{ illustration.name }}
         </div>
-        <div class="col-3 row card-text text-subtitle1 text-bold justify-end">
+        <div class="col-5 row card-text text-subtitle1 text-bold justify-end">
           <!-- {{ product.price.toString().split('.')[0] }} LEI -->
-          de la 50LEI
+          DE LA {{ parseInt(illustration.price.toString()) }} LEI
         </div>
       </div>
     </q-card-section>
@@ -36,10 +36,11 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType, onMounted } from "vue";
+import { defineComponent, PropType } from "vue";
 import { Illustration } from "../lib/models/Illustration";
-import { useUser } from "../lib/useUser";
 import { showToast } from "../lib/useToast";
+import { useUser } from "../lib/useUser";
+import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
   name: "ItemCard",
@@ -55,6 +56,8 @@ export default defineComponent({
       toggleFavoriteIllustrations,
       state: userState,
     } = useUser();
+    const route = useRoute();
+    const router = useRouter();
 
     const onHeartClick = () => {
       if (!userState.user.isLoggedIn) {
@@ -64,8 +67,13 @@ export default defineComponent({
       }
     };
 
+    const openDetailsPage = () => {
+      router.push("/details/" + route.params.id + "/" + illustration.id + "/");
+    };
+
     return {
       onHeartClick,
+      openDetailsPage,
       isIllustrationFavorite,
     };
   },

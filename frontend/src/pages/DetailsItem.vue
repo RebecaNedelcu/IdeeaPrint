@@ -15,11 +15,11 @@
       </div>
       <div class="col-12 col-md-7 column justify-center items-center">
         <div class="details-container q-ma-xl">
-          <div class="text-h3 text-bold q-mb-md">{{selectedProductIllustration.product.name}}</div>
+          <div class="text-h3 text-bold q-mb-md">{{selectedProductIllustration?.product.name}}</div>
           <div class="text-body1 details-text">
             printed with love by Ideeaprint
           </div>
-          <div class="text-bold text-h5 q-mb-xl q-mt-lg">{{selectedProductIllustration.product.price}} LEI</div>
+          <div class="text-bold text-h5 q-mb-xl q-mt-lg">{{selectedProductIllustration?.product.price}} LEI</div>
           <div class="row text-h6">
             <div class="row items-center">
               <span class="q-mr-lg">Size: </span>
@@ -215,8 +215,9 @@ export default defineComponent({
         parseInt(route.params.illustrationId.toString())
       );
       console.log(productIllustrationsState.productIllustrations);
+      selectedProductIllustration.value={} as ProductIllustration;
       selectedColor.value =
-        productIllustrationsState.productIllustrations[0].product.color;
+        productIllustrationsState.productIllustrations[0]?.product.color;
     });
     return {
       a,
