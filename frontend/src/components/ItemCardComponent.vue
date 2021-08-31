@@ -17,7 +17,6 @@
       color="secondary"
       size="md"
       :icon="favBtnIcon ? 'fas fa-heart' : 'far fa-heart'"
-      @click="addToFav"
     />
 
     <q-card-section class="q-px-none">

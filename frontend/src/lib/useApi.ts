@@ -1,6 +1,4 @@
 import { Cookies } from "quasar";
-import { getAccessToken, getExpiresAt } from "./useAccessToken";
-// import { getAccessTokenFromRT } from "./useRefreshToken";
 
 const BASE_URL = "http://localhost:8000/api/";
 
@@ -36,7 +34,7 @@ export async function useApi<T>({
       method: method,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${getAccessToken()}`,
+        Authorization: `Token ${Cookies.get('access_token')}`,
         "X-CSRFToken": Cookies.get("csrftoken"),
       },
       credentials: "include",
@@ -60,7 +58,6 @@ export async function useApi<T>({
         } else {
           apiResponse.error = await response.json();
         }
-        console.log(apiResponse.data);
       }
     } catch (error) {
       console.log("fetch err: ", error);

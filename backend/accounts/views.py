@@ -146,14 +146,10 @@ class CreateUserView(CreateAPIView):
     serializer_class = UserSerializer
 
 
-@api_view(['POST'])
-@requires_csrf_token
-@ensure_csrf_cookie
-def test(request):
-    response = Response()
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user(request):
     serialized_user = UserSerializer(request.user).data
-    response.data = {
-        'user': serialized_user
-    }
-
+    response = Response(serialized_user)
+    
     return response
