@@ -1,5 +1,7 @@
+import { ProductDetails } from "./types/ApiResponses";
+import { CartProduct } from "./models/CartProduct";
 import { showToast } from "./useToast";
-import { Order } from "./models/Order";
+import { Order, OrderApi } from "./models/Order";
 import { useApi } from "./useApi";
 
 export const useCheckout = () => {
@@ -15,7 +17,7 @@ export const useCheckout = () => {
     country,
     paymentType,
   }: Order) => {
-    const { data, error, ok } = await useApi({
+    const { data, error, ok } = await useApi<OrderApi>({
       url: "shop/order/",
       method: "POST",
       body: {
@@ -32,10 +34,26 @@ export const useCheckout = () => {
       },
     });
 
-    if (ok && error.detail === "") {
-      showToast({ message: "Comanda plasata", type: "positive" });
-    }
+    return { data, error, ok };
   };
 
-  return { makeOrder };
+  const sendProducts = async (product: CartProduct, orderId: number) => {
+    const { data: detailsData } = await useApi<ProductDetails>({
+      url: `shop/get_product_details_for_cart/${product.productId}/${product.selectedSize}`,
+    });
+    await useApi<CartProduct>({
+      url: "shop/order_products/",
+      method: "POST",
+      body: {
+        order: orderId,
+        product: detailsData.id,
+        quantity: product.quantity,
+        price: product.price,
+        illustration: product.illustrationId,
+        llustration_from_user: product.editorIllustration,
+      },
+    });
+  };
+
+  return { makeOrder, sendProducts };
 };

@@ -212,6 +212,7 @@
 import { defineComponent, ref } from "vue";
 import { useUser } from "../lib/useUser";
 import { useCheckout } from "../lib/useCheckout";
+import { useCart } from "../lib/useCart";
 
 export default defineComponent({
   name: "PageCheckout",
@@ -223,7 +224,8 @@ export default defineComponent({
     const done3 = ref(false);
 
     const { state: userState } = useUser();
-    const { makeOrder } = useCheckout();
+    const { makeOrder, sendProducts } = useCheckout();
+    const { state: cartState } = useCart();
 
     const firstnameCo = ref(userState.user.firstName ?? "");
     const lastnameCo = ref(userState.user.lastName ?? "");
@@ -239,19 +241,31 @@ export default defineComponent({
       done2.value = true;
       step.value = 3;
 
-      await makeOrder({
-        firstName: firstnameCo.value,
-        lastName: lastnameCo.value,
-        phone: telephonenameCo.value,
-        company: companyCo.value,
-        street: streetCo.value,
-        city: cityCo.value,
-        zipcode: zipcodeCo.value,
-        county: countyCo.value,
-        country: countryCo.value,
-        paymentType: "2",
-        status: "1",
-      });
+      try {
+        const {
+          data: orderData,
+          error,
+          ok,
+        } = await makeOrder({
+          firstName: firstnameCo.value,
+          lastName: lastnameCo.value,
+          phone: telephonenameCo.value,
+          company: companyCo.value,
+          street: streetCo.value,
+          city: cityCo.value,
+          zipcode: zipcodeCo.value,
+          county: countyCo.value,
+          country: countryCo.value,
+          paymentType: "2",
+          status: "1",
+        });
+
+        if (ok && error.detail === "") {
+          cartState.cartProducts.forEach(async (product) => {
+            await sendProducts(product, orderData.id);
+          });
+        }
+      } catch (error) {}
     };
 
     return {
