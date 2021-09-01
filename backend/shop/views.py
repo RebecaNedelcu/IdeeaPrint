@@ -6,8 +6,8 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.routers import Response
 
-from .models import ContactMessage, Illustration, Order, Product, ProductDetails, Favorite, ProductIllustration
-from .serializers import (ContactMessageSerializer, FavoriteSerializer, IllustrationSerializer, OrderSerializer, ProductDetailsSerializer, ProductIllustrationSerializer,
+from .models import ContactMessage, Illustration, Order, OrderProducts, Product, ProductDetails, Favorite, ProductIllustration
+from .serializers import (ContactMessageSerializer, FavoriteSerializer, IllustrationSerializer, OrderSerializer, OrderedProductsSerializer, ProductDetailsSerializer, ProductIllustrationSerializer,
                           ProductSerializer)
 
 
@@ -120,3 +120,20 @@ class OrderViewset(viewsets.ModelViewSet):
     authentication_classes = []
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
+
+
+class OrderProductViewset(viewsets.ModelViewSet):
+    serializer_class = OrderedProductsSerializer
+    queryset = OrderProducts.objects.all()
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+
+@api_view(['GET'])
+@permission_classes([])
+def get_product_details_for_cart(request, product_id, size):
+    product_details = ProductDetails.objects.get(
+        product__id=product_id, size=size)
+    serialized_data = ProductDetailsSerializer(product_details)
+
+    return Response(serialized_data.data)
