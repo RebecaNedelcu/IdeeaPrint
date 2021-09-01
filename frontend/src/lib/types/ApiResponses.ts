@@ -1,3 +1,5 @@
+import { Sex, Size } from "src/components/models";
+import { Product } from "../models/Product";
 import { ApiUser } from "../models/User";
 
 export interface LoginResponse {
@@ -15,4 +17,15 @@ export interface RegisterResponse {
   is_staff: boolean;
   last_name: string;
   username: string;
+}
+
+export interface ProductDetails {
+  id: number;
+  product: Product;
+  price: number;
+  color: string;
+  size: Size;
+  sex: Sex;
+  quantity: number;
+  product_images: string[];
 }

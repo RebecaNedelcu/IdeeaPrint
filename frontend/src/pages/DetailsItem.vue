@@ -10,23 +10,30 @@
           class="carusel"
           height="100%"
         >
-          <q-carousel-slide :name="1" :img-src="selectedProductIllustration?.image" />
+          <q-carousel-slide
+            :name="1"
+            :img-src="selectedProductIllustration?.image"
+          />
         </q-carousel>
       </div>
       <div class="col-12 col-md-7 column justify-center items-center">
         <div class="details-container q-ma-xl">
-          <div class="text-h3 text-bold q-mb-md">{{selectedProductIllustration?.product.name}}</div>
+          <div class="text-h3 text-bold q-mb-md">
+            {{ selectedProductIllustration?.product.name }}
+          </div>
           <div class="text-body1 details-text">
             printed with love by Ideeaprint
           </div>
-          <div class="text-bold text-h5 q-mb-xl q-mt-lg">{{selectedProductIllustration?.product.price}} LEI</div>
+          <div class="text-bold text-h5 q-mb-xl q-mt-lg">
+            {{ selectedProductIllustration?.product.price }} LEI
+          </div>
           <div class="row text-h6">
             <div class="row items-center">
               <span class="q-mr-lg">Size: </span>
               <q-select
                 borderless
-                v-model="model"
-                :options="options"
+                v-model="selectedSize"
+                :options="sizes"
                 dense
                 color="secondary"
                 class="q-mr-xl"
@@ -57,51 +64,6 @@
                   </q-icon>
                 </div>
               </div>
-              <!-- <q-btn-toggle
-                class="justify-center no-border-radius"
-                v-model="selected"
-                
-                :toggle-color="selected"
-                unelevated
-                size="xs"
-                :options="[
-                  {
-                    class: 'q-ma-sm ',
-                    round: true,
-                    icon: selected === 'red-14' ? 'done' : '',
-                    color: a,
-                    value: 'red-14',
-                  },
-                  {
-                    class: 'q-ma-sm ',
-                    round: true,
-                    icon: selected === 'blue' ? 'done' : '',
-                    color: 'blue',
-                    value: 'blue',
-                  },
-                  {
-                    class: 'q-ma-sm ',
-                    round: true,
-                    icon: selected === 'yellow' ? 'done' : '',
-                    color: 'yellow',
-                    value: 'yellow',
-                  },
-                  {
-                    class: 'q-ma-sm ',
-                    round: true,
-                    icon: selected === 'purple' ? 'done' : '',
-                    color: 'purple',
-                    value: 'purple',
-                  },
-                  {
-                    class: 'q-ma-sm ',
-                    round: true,
-                    icon: selected === 'brown' ? 'done' : '',
-                    color: 'brown',
-                    value: 'brown',
-                  },
-                ]"
-              />-->
             </div>
           </div>
           <q-separator
@@ -171,28 +133,39 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted ,watch } from "vue";
+import { defineComponent, ref, onMounted, watch } from "vue";
 import { useProductIllustration } from "../lib/useProductIllustration";
+import { useProducts } from "../lib/useProducts";
 import { useRoute } from "vue-router";
 import { ProductIllustration } from "../lib/models/ProductIllustration";
+import { Size } from "../components/models";
 export default defineComponent({
   name: "DetailsItem",
   components: {},
   setup() {
     let route = useRoute();
     const selectedColor = ref("");
+    const sizes = ref<Size[]>([]);
     const selectColor = (val: string) => {
       selectedColor.value = val;
     };
     const selectedProductIllustration = ref<ProductIllustration>();
-    const updateSelectedProduct = () => {
-      productIllustrationsState.productIllustrations.forEach(element => {
-        if(element.product.color===selectedColor.value)
-          selectedProductIllustration.value = productIllustrationsState.productIllustrations[productIllustrationsState.productIllustrations.indexOf(element)]
+    const updateSelectedProduct = async () => {
+      productIllustrationsState.productIllustrations.forEach((element) => {
+        if (element.product.color === selectedColor.value) {
+          selectedProductIllustration.value =
+            productIllustrationsState.productIllustrations[
+              productIllustrationsState.productIllustrations.indexOf(element)
+            ];
+          retrieveProductDetails(
+            productIllustrationsState.productIllustrations[
+              productIllustrationsState.productIllustrations.indexOf(element)
+            ].product.id
+          );
+        }
       });
-      console.log(selectedProductIllustration.value)
-    }
-    watch(selectedColor,updateSelectedProduct);
+    };
+    watch(selectedColor, updateSelectedProduct);
     function useQtySelect() {
       let qty = ref(1);
       function increment() {
@@ -205,22 +178,42 @@ export default defineComponent({
       }
       return { qty, increment, decrement };
     }
-    let a = ref("#DDD");
     const { state: productIllustrationsState, loadProductIllustrations } =
       useProductIllustration();
+
+    const { getProductDetails } = useProducts();
+
+    const retrieveProductDetails = async (productId: number) => {
+      const data = await getProductDetails(productId);
+      sizes.value = [];
+      selectedSize.value = undefined;
+      if (data)
+        data.forEach((detail) => {
+          if (!sizes.value.includes(detail.size)) {
+            sizes.value.push(detail.size);
+          }
+        });
+    };
 
     onMounted(async () => {
       await loadProductIllustrations(
         parseInt(route.params.productType.toString()),
         parseInt(route.params.illustrationId.toString())
       );
-      console.log(productIllustrationsState.productIllustrations);
-      selectedProductIllustration.value={} as ProductIllustration;
+      selectedProductIllustration.value = {} as ProductIllustration;
       selectedColor.value =
         productIllustrationsState.productIllustrations[0]?.product.color;
+
+      try {
+        await retrieveProductDetails(
+          productIllustrationsState.productIllustrations[0]?.product.id
+        );
+      } catch (error) {}
     });
+
+    const selectedSize = ref<Size>();
+
     return {
-      a,
       selected: ref("yellow"),
       slide: ref(1),
       text: ref(""),
@@ -229,7 +222,8 @@ export default defineComponent({
       selectedColor,
       selectedProductIllustration,
       ...useQtySelect(),
-      model: ref(null),
+      selectedSize,
+      sizes,
       options: ["XS", "S", "M", "L", "XL", "XXL"],
       qpageMinHeight() {
         return { minHeight: "1vh" };

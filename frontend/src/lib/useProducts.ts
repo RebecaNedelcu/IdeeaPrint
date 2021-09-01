@@ -1,5 +1,6 @@
 import { Product } from "src/components/models";
 import { reactive } from "vue";
+import { ProductDetails } from "./types/ApiResponses";
 import { useApi } from "./useApi";
 
 interface stateType {
@@ -34,5 +35,15 @@ export const useProducts = () => {
     }
   };
 
-  return { state, changePrice, loadProducts };
+  const getProductDetails = async (productId: number) => {
+    try {
+      const { data } = await useApi<ProductDetails[]>({
+        url: `shop/get_product_details/${productId}`,
+      });
+
+      return data;
+    } catch (error) {}
+  };
+
+  return { state, changePrice, loadProducts, getProductDetails };
 };
