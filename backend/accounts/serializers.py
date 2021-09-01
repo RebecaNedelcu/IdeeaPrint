@@ -1,3 +1,4 @@
+from .models import UserDetails
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
@@ -16,8 +17,8 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             username=validated_data['email'],
             email=validated_data['email'],
-            first_name = validated_data['first_name'],
-            last_name = validated_data['last_name'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
         )
 
         user.set_password(validated_data['password'])
@@ -69,3 +70,20 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class UserDetailsSerialzer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = UserDetails
+        fields = [
+            'phone',
+            'company',
+            'street',
+            'city',
+            'zipcode',
+            'county',
+            'country',
+            'user',
+        ]

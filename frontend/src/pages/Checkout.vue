@@ -19,7 +19,7 @@
             <q-input
               square
               standout="bg-grey-3"
-              v-model="firstname"
+              v-model="firstnameCo"
               placeholder="First name"
               class="borderLabel q-mt-sm q-mr-xs col"
               :input-style="{ color: '#000000' }"
@@ -27,7 +27,7 @@
             <q-input
               square
               standout="bg-grey-3"
-              v-model="firstnameCo"
+              v-model="lastnameCo"
               placeholder="Last name"
               class="borderLabel q-mt-sm q-ml-xs col"
               :input-style="{ color: '#000000' }"
@@ -37,7 +37,7 @@
             <q-input
               square
               standout="bg-grey-3"
-              v-model="lastnameCo"
+              v-model="telephonenameCo"
               placeholder="Telephone"
               class="borderLabel q-mt-sm q-mr-xs col"
               :input-style="{ color: '#000000' }"
@@ -131,7 +131,7 @@
           />
           <div class="text-body1">Delivery between 2-5 work days.</div>
         </div>
-        <div v-if="group==='op-card'" class="column allInput q-my-lg">
+        <div v-if="group === 'op-card'" class="column allInput q-my-lg">
           <q-input
             square
             standout="bg-grey-3"
@@ -182,24 +182,26 @@
             class="q-ml-sm"
           />
           <q-btn
-            @click="
-              () => {
-                done2 = true;
-                step = 3;
-              }
-            "
+            @click="onFinishClick"
             label="Finish"
             class="continueBtn no-border-radius"
           />
         </q-stepper-navigation>
       </q-step>
       <q-step :name="3" title="STATUS" icon="pending" :done="done3">
-          <div class="column items-center text-h3 text-bold">THANK YOU FOR YOUR ORDER!</div>
-          <div class="column items-center text-bold text-h4 q-mt-xl">STATUS:</div>
-          <div class="column items-center text-bold text-h3 q-mb-xl q-mt-sm">DELIVERD</div>
+        <div class="column items-center text-h3 text-bold">
+          THANK YOU FOR YOUR ORDER!
+        </div>
+        <div class="column items-center text-bold text-h4 q-mt-xl">STATUS:</div>
+        <div class="column items-center text-bold text-h3 q-mb-xl q-mt-sm">
+          DELIVERD
+        </div>
         <q-stepper-navigation class="row justify-end q-mx-xl">
-          <q-btn  @click="done3 = true" label="Done" class="continueBtn no-border-radius " />
-          
+          <q-btn
+            @click="done3 = true"
+            label="Done"
+            class="continueBtn no-border-radius"
+          />
         </q-stepper-navigation>
       </q-step>
     </q-stepper>
@@ -208,6 +210,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useUser } from "../lib/useUser";
+import { useCheckout } from "../lib/useCheckout";
 
 export default defineComponent({
   name: "PageCheckout",
@@ -217,11 +221,45 @@ export default defineComponent({
     const done1 = ref(false);
     const done2 = ref(false);
     const done3 = ref(false);
+
+    const { state: userState } = useUser();
+    const { makeOrder } = useCheckout();
+
+    const firstnameCo = ref(userState.user.firstName ?? "");
+    const lastnameCo = ref(userState.user.lastName ?? "");
+    const telephonenameCo = ref(userState.user.phone ?? "");
+    const companyCo = ref(userState.user.company ?? "");
+    const streetCo = ref(userState.user.street ?? "");
+    const cityCo = ref(userState.user.city ?? "");
+    const zipcodeCo = ref(userState.user.zipcode ?? "");
+    const countyCo = ref(userState.user.county ?? "");
+    const countryCo = ref(userState.user.country ?? "");
+
+    const onFinishClick = async () => {
+      done2.value = true;
+      step.value = 3;
+
+      await makeOrder({
+        firstName: firstnameCo.value,
+        lastName: lastnameCo.value,
+        phone: telephonenameCo.value,
+        company: companyCo.value,
+        street: streetCo.value,
+        city: cityCo.value,
+        zipcode: zipcodeCo.value,
+        county: countyCo.value,
+        country: countryCo.value,
+        paymentType: "2",
+        status: "1",
+      });
+    };
+
     return {
       step,
       done1,
       done2,
       done3,
+      onFinishClick,
 
       reset() {
         done1.value = false;
@@ -229,15 +267,15 @@ export default defineComponent({
         done3.value = false;
         step.value = 1;
       },
-      firstnameCo: ref(""),
-      lastnameCo: ref(""),
-      telephonenameCo: ref(""),
-      companyCo: ref(""),
-      streetCo: ref(""),
-      cityCo: ref(""),
-      zipcodeCo: ref(""),
-      countyCo: ref(""),
-      countryCo: ref(""),
+      firstnameCo,
+      lastnameCo,
+      telephonenameCo,
+      companyCo,
+      streetCo,
+      cityCo,
+      zipcodeCo,
+      countryCo,
+      countyCo,
 
       group: ref("op-card"),
 

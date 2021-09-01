@@ -1,7 +1,7 @@
 import { Cookies } from "quasar";
 import { reactive } from "vue";
 import { FavoriteIllustrations } from "./models/Illustration";
-import { ApiUser } from "./models/User";
+import { ApiUser, ApiUserDetails } from "./models/User";
 import { LoginResponse, RegisterResponse } from "./types/ApiResponses";
 import { addMinutes, setAccessToken, setExpiresAt } from "./useAccessToken";
 import { useApi } from "./useApi";
@@ -15,6 +15,13 @@ interface StateType {
     lastName: string;
     isLoggedIn: boolean;
     favoriteIllustrations: number[];
+    city?: string;
+    company?: string;
+    country?: string;
+    county?: string;
+    phone?: string;
+    street?: string;
+    zipcode?: string;
   };
 }
 
@@ -26,6 +33,13 @@ const state = reactive<StateType>({
     lastName: "",
     isLoggedIn: false,
     favoriteIllustrations: [],
+    city: "",
+    company: "",
+    country: "",
+    county: "",
+    phone: "",
+    street: "",
+    zipcode: "",
   },
 });
 
@@ -46,6 +60,22 @@ export const useUser = () => {
       state.user.lastName = "";
       state.user.isLoggedIn = false;
       state.user.favoriteIllustrations = [];
+    }
+  };
+
+  const setUserWithDetails = (data: ApiUserDetails | undefined) => {
+    if (data) {
+      state.user.email = data.user.email;
+      state.user.firstName = data.user.first_name;
+      state.user.lastName = data.user.last_name;
+      state.user.isLoggedIn = true;
+      state.user.city = data.city;
+      state.user.company = data.company;
+      state.user.country = data.country;
+      state.user.county = data.county;
+      state.user.zipcode = data.zipcode;
+      state.user.phone = data.phone;
+      state.user.street = data.street;
     }
   };
 
@@ -146,8 +176,10 @@ export const useUser = () => {
 
   const getUserDetails = async () => {
     try {
-      const { data } = await useApi<ApiUser>({ url: "get_user" });
-      setUser(data);
+      const { data } = await useApi<ApiUserDetails>({
+        url: "get_user_details",
+      });
+      setUserWithDetails(data);
       await getFavoriteIllustrations();
     } catch (error) {
       console.log(error);
