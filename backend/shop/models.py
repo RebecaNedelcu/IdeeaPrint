@@ -1,3 +1,4 @@
+from datetime import datetime
 from colorfield.fields import ColorField
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -5,6 +6,13 @@ from django.db.models.aggregates import Max
 from django.contrib.auth.models import User
 
 from .constants import PAYMENT_TYPES, PRODUCT_SEX_TYPE, PRODUCT_SIZES, PRODUCT_TYPES, STATUS_TYPES
+
+from datetime import timedelta
+from django.utils import timezone
+
+
+def in_three_days():
+    return timezone.now().date() + timedelta(days=3)
 
 
 class Illustration(models.Model):
@@ -15,8 +23,6 @@ class Illustration(models.Model):
 
     def __str__(self):
         return f"Illustration - {self.name}"
-
-
 
 
 class Product(models.Model):
@@ -51,15 +57,15 @@ class ProductIllustration(models.Model):
     def __str__(self):
         return f"{self.product} - {self.illustration} - image"
 
-
     class Meta:
         unique_together = [('product',  'illustration')]
         verbose_name = 'Product Illustration'
-        verbose_name_plural = 'Products Illustrations'  
+        verbose_name_plural = 'Products Illustrations'
 
 
 class IllustrationProductType(models.Model):
-    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE, related_name='products_type')
+    illustration = models.ForeignKey(
+        Illustration, on_delete=models.CASCADE, related_name='products_type')
     type = models.CharField(max_length=10, choices=PRODUCT_TYPES)
 
     def __str__(self):
@@ -83,7 +89,6 @@ class ProductImages(models.Model):
 class Favorite(models.Model):
     illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
 
     def __str__(self):
         return f"{self.user} - {self.illustration}"
@@ -103,8 +108,8 @@ class Order(models.Model):
     county = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     payment_type = models.CharField(max_length=10, choices=PAYMENT_TYPES)
-    status = models.CharField(max_length=10, choices=STATUS_TYPES)
-    delivery_date = models.DateField()
+    status = models.CharField(max_length=10, choices=STATUS_TYPES, default=1)
+    delivery_date = models.DateField(default=in_three_days)
 
     def __str__(self):
         return f"Order #{self.id} for {self.first_name} {self.last_name}"
@@ -115,7 +120,8 @@ class OrderProducts(models.Model):
     product = models.ForeignKey(ProductDetails, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE, blank=True, null=True)
+    illustration = models.ForeignKey(
+        Illustration, on_delete=models.CASCADE, blank=True, null=True)
     illustration_from_user = models.ImageField(blank=True, null=True)
 
     def __str__(self):

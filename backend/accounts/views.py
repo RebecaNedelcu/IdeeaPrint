@@ -1,3 +1,4 @@
+from .models import UserDetails
 import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -15,7 +16,7 @@ from rest_framework.response import Response
 from accounts.utils import (generate_access_token, generate_refresh_token,
                             set_refresh_token)
 
-from .serializers import ChangePasswordSerializer, UserSerializer
+from .serializers import ChangePasswordSerializer, UserDetailsSerialzer, UserSerializer
 
 
 # Create your views here.
@@ -155,3 +156,12 @@ def get_user(request):
     return response
 
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_details(request):
+    user =  UserDetails.objects.get(user=request.user)
+    serialized_user = UserDetailsSerialzer(user).data
+    response = Response(serialized_user)
+    
+    return response

@@ -68,7 +68,10 @@ export default defineComponent({
     };
 
     const openDetailsPage = () => {
-      router.push("/details/" + route.params.id + "/" + illustration.id + "/");
+      if (route.params.id)
+        router.push(
+          "/details/" + route.params.id + "/" + illustration.id + "/"
+        );
     };
 
     return {
