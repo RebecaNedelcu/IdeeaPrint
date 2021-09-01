@@ -8,8 +8,8 @@ from accounts.serializers import UserSerializer
 class IllustrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Illustration
-        fields = ['id','image', 'name', 'created_at','price']
-        
+        fields = ['id', 'image', 'name', 'created_at', 'price']
+
     def get_image(self, illustration):
         request = self.context.get('request')
         image = illustration.image.url
@@ -21,7 +21,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id','name','type','price','color']
+        fields = ['id', 'name', 'type', 'price', 'color']
 
 
 class ProductImagesSerializer(serializers.ModelSerializer):
@@ -32,11 +32,11 @@ class ProductImagesSerializer(serializers.ModelSerializer):
 
 class ProductDetailsSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
-    product_images = ProductImagesSerializer(many=True)
 
     class Meta:
         model = ProductDetails
-        fields = ['id', 'product', 'price', 'color', 'size', 'sex', 'quantity', 'product_images']
+        fields = ['id', 'product',  'size',
+                  'sex', 'quantity']
 
 
 class ProductIllustrationSerializer(serializers.ModelSerializer):
@@ -45,7 +45,8 @@ class ProductIllustrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductIllustration
-        fields = ['id','product','illustration','image']
+        fields = ['id', 'product', 'illustration', 'image']
+
 
 class FavoriteSerializer(serializers.ModelSerializer):
     illustration = IllustrationSerializer()
@@ -53,10 +54,10 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
-        fields = ['id','illustration','user']
+        fields = ['id', 'illustration', 'user']
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage
-        fields = ['id','name','email','message']
+        fields = ['id', 'name', 'email', 'message']

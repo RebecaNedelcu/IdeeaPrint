@@ -85,3 +85,12 @@ def toggle_favorite(request, illustration_id):
         Favorite.objects.create(user=request.user, illustration=Illustration.objects.get(id=illustration_id))
 
     return Response()
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_product_details(request, product_id):
+    product_details = ProductDetails.objects.filter(product=product_id)
+    serialized_data = ProductDetailsSerializer(product_details, many=True)
+
+    return Response(serialized_data.data)

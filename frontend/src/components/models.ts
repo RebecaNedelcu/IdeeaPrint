@@ -7,7 +7,7 @@ enum ProductType {
   Totebag,
 }
 
-enum Size {
+export enum Size {
   XS,
   S,
   M,
@@ -16,7 +16,7 @@ enum Size {
   XXL,
 }
 
-enum Sex {
+export enum Sex {
   Man,
   Woman,
   Unisex,
