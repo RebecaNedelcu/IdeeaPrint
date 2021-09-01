@@ -75,7 +75,7 @@
           marginBtn
         "
       />
-      <q-btn
+      <!-- <q-btn
         no-caps
         flat
         color="black"
@@ -88,7 +88,7 @@
           bttns-home
           q-mt-sm
         "
-      />
+      /> -->
     </div>
   </q-page>
 </template>
@@ -113,21 +113,25 @@ export default defineComponent({
     const password2 = ref("");
 
     const onRegisterClick = async () => {
-      try {
-        const { error } = await register(
-          email.value,
-          password.value,
-          firstName.value,
-          lastName.value
-        );
-        if (error) {
-          showToast({ type: "negative", message: error });
-          return;
-        }
-        await login(email.value, password.value)
-        showToast({ type: "positive", message: "Logged in" });
-        router.push("/");
-      } catch (error) {}
+      if (firstName.value === "" || lastName.value === "" || email.value === "" || password.value === "" || password2.value === "") {
+        showToast({ type: "negative", message: "Câmp gol!" });
+      } else {
+        try {
+          const { error } = await register(
+            email.value,
+            password.value,
+            firstName.value,
+            lastName.value
+          );
+          if (error) {
+            showToast({ type: "negative", message: error });
+            return;
+          }
+          await login(email.value, password.value);
+          showToast({ type: "positive", message: "Logged in" });
+          router.push("/");
+        } catch (error) {}
+      }
     };
 
     return {

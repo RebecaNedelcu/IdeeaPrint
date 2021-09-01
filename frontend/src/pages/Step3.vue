@@ -397,30 +397,34 @@
           <q-item v-if="!cursor" class="q-py-none">
             <q-item-section>
               <div class="row justify-around q-mb-md">
-              <q-input  v-model="penToolColor" dense color="accent" class="col-7">
-                <template v-slot:append>
-                  <q-icon
-                    name="fas fa-square"
-                    :style="{ color: penToolColor }"
-                    class="cursor-pointer"
-                  >
-                    <q-popup-proxy
-                      transition-show="scale"
-                      transition-hide="scale"
+                <q-input
+                  v-model="penToolColor"
+                  dense
+                  color="accent"
+                  class="col-7"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      name="fas fa-square"
+                      :style="{ color: penToolColor }"
+                      class="cursor-pointer"
                     >
-                      <q-color v-model="penToolColor" />
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-              <q-input
-                v-model.number="penToolWidth"
-                type="number"
-                class="col-3"
-      
-                dense
-                color="accent"
-              />
+                      <q-popup-proxy
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-color v-model="penToolColor" />
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+                <q-input
+                  v-model.number="penToolWidth"
+                  type="number"
+                  class="col-3"
+                  dense
+                  color="accent"
+                />
               </div>
             </q-item-section>
           </q-item>
@@ -479,6 +483,7 @@
             color="black"
             class="no-border-radius buttonFinish q-px-xl q-py-md"
             text-color="black"
+            @click="addProductToCart"
           />
         </div>
         <q-btn
@@ -495,11 +500,17 @@
 <script lang="ts">
 import { fabric } from "fabric";
 import { defineComponent, onMounted, ref, watch } from "vue";
+import { useCart } from "../lib/useCart";
+import { useRouter, useRoute } from "vue-router";
+import { showToast } from "../lib/useToast";
 
 export default defineComponent({
   name: "DesignStep3",
 
   setup() {
+    const router = useRouter();
+    const route = useRoute();
+    let previewImage = ref("");
     window.addEventListener("keydown", (e) => {
       if (e.key === "Delete") {
         deteleObject();
@@ -866,7 +877,7 @@ export default defineComponent({
       image.onload = function () {
         ctx?.drawImage(image, 0, 0, 200, 282.84);
       };
-      image.src = require("../assets/white-tshirt-background.png");
+      image.src = previewImage.value;
       let data = canvas.toDataURL({ multiplier: 3, format: "png" });
       var img = new Image();
       img.onload = function () {
@@ -879,6 +890,16 @@ export default defineComponent({
     };
     onMounted(() => {
       //de aici incepe fabric
+      if (parseInt(route.params.productType.toString()) === 1) {
+        previewImage.value = require("../assets/white-tshirt-background.png");
+      } else if (parseInt(route.params.productType.toString()) === 2) {
+        previewImage.value = require("../assets/hoodie-background.jpeg");
+      } else if (parseInt(route.params.productType.toString()) === 3) {
+        previewImage.value = require("../assets/mug-background.jpeg");
+        
+      } else if (parseInt(route.params.productType.toString()) === 4) {
+        previewImage.value = require("../assets/totebag-background.jpeg");
+      }
       canvas = new fabric.Canvas("canvas");
       canvas.on("mouse:down", function (options: any) {
         if (options.target) {
@@ -921,10 +942,35 @@ export default defineComponent({
         image.onload = function () {
           ctx?.drawImage(image, 0, 0, 200, 282.84);
         };
-        image.src = require("../assets/white-tshirt-background.png");
+        image.src = previewImage.value;
       }
     });
 
+    const { addCartProduct } = useCart();
+
+    let sizes = [];
+    sizes.push(route.params.size.toString());
+    const addProductToCart = () => {
+      // if (selectedProductIllustration.value) {
+      //   if (selectedSize.value) {
+      addCartProduct(
+        parseInt(route.params.idProduct.toString()),
+        NaN,
+        "",
+        1,
+        route.params.price.toString(),
+        route.params.name.toString(),
+        sizes,
+        route.params.size.toString(),
+        previewImage.value
+      );
+      //   } else {
+      //     showToast({ type: "negative", message: "Alege o mărime!" });
+      //   }
+      // } else {
+      //   showToast({ type: "negative", message: "Alege un produs!" });
+      // }
+    };
     return {
       previewCanvas,
       functieDeTest,
@@ -976,6 +1022,7 @@ export default defineComponent({
       ungroup,
       isActiveObjectTypeText,
       isActiveObjectTypeGroup,
+      addProductToCart,
     };
   },
 });
