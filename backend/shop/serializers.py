@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
-from .models import ContactMessage, Favorite, Illustration, Order, Product, ProductDetails, ProductIllustration, ProductImages
+from .models import ContactMessage, Favorite, Illustration, Order, OrderProducts, Product, ProductDetails, ProductIllustration, ProductImages
 from accounts.serializers import UserSerializer
 # Serializers define the API representation.
 
@@ -67,6 +67,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            'id',
             'first_name',
             'last_name',
             'phone',
@@ -79,4 +80,17 @@ class OrderSerializer(serializers.ModelSerializer):
             'payment_type',
             'status',
             'delivery_date',
+        ]
+
+
+class OrderedProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderProducts
+        fields = [
+            'order',
+            'product',
+            'quantity',
+            'price',
+            'illustration',
+            'illustration_from_user',
         ]
