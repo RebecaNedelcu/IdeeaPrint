@@ -41,11 +41,4 @@ export interface Product {
   product_images?: [{ image: string }];
 }
 
-export interface CartProduct {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  size: string;
-  quantity: number;
-}
+

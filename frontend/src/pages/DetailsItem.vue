@@ -100,6 +100,7 @@
               size="lg"
               v-close-popup
               class="no-border-radius addToCartButton text-bold q-mt-md"
+              @click="addProductToCart"
             />
             <q-btn
               flat
@@ -136,9 +137,12 @@
 import { defineComponent, ref, onMounted, watch } from "vue";
 import { useProductIllustration } from "../lib/useProductIllustration";
 import { useProducts } from "../lib/useProducts";
+import { useCart } from "../lib/useCart";
 import { useRoute } from "vue-router";
 import { ProductIllustration } from "../lib/models/ProductIllustration";
 import { Size } from "../components/models";
+import { showToast } from "../lib/useToast";
+
 export default defineComponent({
   name: "DetailsItem",
   components: {},
@@ -166,17 +170,12 @@ export default defineComponent({
       });
     };
     watch(selectedColor, updateSelectedProduct);
-    function useQtySelect() {
-      let qty = ref(1);
-      function increment() {
-        qty.value += 1;
-        return qty.value;
-      }
-      function decrement() {
-        if (qty.value > 1) qty.value -= 1;
-        return qty.value;
-      }
-      return { qty, increment, decrement };
+    let qty = ref(1);
+    function increment() {
+      qty.value += 1;
+    }
+    function decrement() {
+      if (qty.value > 1) qty.value -= 1;
     }
     const { state: productIllustrationsState, loadProductIllustrations } =
       useProductIllustration();
@@ -213,6 +212,30 @@ export default defineComponent({
 
     const selectedSize = ref<Size>();
 
+    const { state: cartState, addCartProduct } = useCart();
+
+    const addProductToCart = () => {
+      if (selectedProductIllustration.value) {
+        if (selectedSize.value) {
+          addCartProduct(
+            selectedProductIllustration.value.product.id,
+            parseInt(route.params.illustrationId.toString()),
+            "",
+            qty.value,
+            selectedProductIllustration.value.product.price,
+            selectedProductIllustration.value.product.name,
+            sizes.value,
+            selectedSize.value,
+            selectedProductIllustration.value.image
+          );
+        } else {
+          showToast({ type: "negative", message: "Alege o mărime!" });
+        }
+      } else {
+        showToast({ type: "negative", message: "Alege un produs!" });
+      }
+    };
+
     return {
       selected: ref("yellow"),
       slide: ref(1),
@@ -221,13 +244,16 @@ export default defineComponent({
       selectColor,
       selectedColor,
       selectedProductIllustration,
-      ...useQtySelect(),
+      qty,
+      increment,
+      decrement, 
       selectedSize,
       sizes,
       options: ["XS", "S", "M", "L", "XL", "XXL"],
       qpageMinHeight() {
         return { minHeight: "1vh" };
       },
+      addProductToCart,
     };
   },
 });
