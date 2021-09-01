@@ -213,6 +213,7 @@ import { defineComponent, ref } from "vue";
 import { useUser } from "../lib/useUser";
 import { useCheckout } from "../lib/useCheckout";
 import { useCart } from "../lib/useCart";
+import { showToast } from "../lib/useToast";
 
 export default defineComponent({
   name: "PageCheckout",
@@ -237,10 +238,9 @@ export default defineComponent({
     const countyCo = ref(userState.user.county ?? "");
     const countryCo = ref(userState.user.country ?? "");
 
-    const onFinishClick = async () => {
-      done2.value = true;
-      step.value = 3;
+    const canDo = ref(true);
 
+    const onFinishClick = async () => {
       try {
         const {
           data: orderData,
@@ -262,8 +262,29 @@ export default defineComponent({
 
         if (ok && error.detail === "") {
           cartState.cartProducts.forEach(async (product) => {
-            await sendProducts(product, orderData.id);
+            const { data, error, ok } = await sendProducts(
+              product,
+              orderData.id
+            );
+            if (!ok) {
+              showToast({ message: "Stoc insuficient", type: "negative" });
+              canDo.value = false;
+              console.log(canDo);
+
+              return;
+            }
+            if (error.detail !== "") {
+              showToast({ message: error.detail, type: "warning" });
+              canDo.value = false;
+              return;
+            }
           });
+          setTimeout(() => {
+            if (canDo.value) {
+              done2.value = true;
+              step.value = 3;
+            }
+          }, 1000);
         }
       } catch (error) {}
     };

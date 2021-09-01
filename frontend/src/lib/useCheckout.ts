@@ -41,7 +41,7 @@ export const useCheckout = () => {
     const { data: detailsData } = await useApi<ProductDetails>({
       url: `shop/get_product_details_for_cart/${product.productId}/${product.selectedSize}`,
     });
-    await useApi<CartProduct>({
+    const { data, error, ok } = await useApi<CartProduct>({
       url: "shop/order_products/",
       method: "POST",
       body: {
@@ -53,6 +53,9 @@ export const useCheckout = () => {
         llustration_from_user: product.editorIllustration,
       },
     });
+
+
+    return{ok, data, error}
   };
 
   return { makeOrder, sendProducts };
