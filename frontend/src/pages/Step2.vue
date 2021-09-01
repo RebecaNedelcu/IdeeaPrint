@@ -116,6 +116,7 @@
             col
             self-end
           "
+          @click="goToStep3"
         />
       </div>
     </div>
@@ -126,14 +127,17 @@
 import { defineComponent, ref, onMounted, watch, watchEffect } from "vue";
 import { useProducts } from "../lib/useProducts";
 import { Product } from "../lib/models/Product";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { Size } from "../components/models";
+import { showToast } from "../lib/useToast";
 
 export default defineComponent({
   name: "DesignStep2",
   components: {},
   setup() {
     const route = useRoute();
+    const router = useRouter();
+
     const { getProductsByType, getProductDetails } = useProducts();
     let products = ref<Product[]>();
     const sizes = ref<Size[]>([]);
@@ -151,11 +155,16 @@ export default defineComponent({
       }
     };
 
+    let productId = ref();
+    let productPrice = ref();
+    let productName = ref();
     const updateSizes = async () => {
-      let productId = ref();
+      selectedSize.value = "";
       products.value?.forEach((product) => {
         if (product.color === selectedColor.value) {
           productId.value = product.id;
+          productPrice.value = product.price;
+          productName.value = product.name;
         }
       });
       const data = await getProductDetails(productId.value);
@@ -185,6 +194,14 @@ export default defineComponent({
       return !sizes.value.toString().includes(size);
     };
 
+    const goToStep3 = () => {
+      if(selectedSize.value){
+        router.push("/step3/"+route.params.productType.toString()+"/"+productId.value+"/"+productPrice.value+"/"+selectedSize.value+"/"+productName.value);
+        console.log("push")
+      } else {
+        showToast({ type: "negative", message: "Alege o mărime!" });
+      }
+    };
     return {
       male: ref(false),
       female: ref(false),
@@ -198,6 +215,7 @@ export default defineComponent({
       stringSizes,
       selectedSize,
       sizeIncluded,
+      goToStep3,
     };
   },
 });

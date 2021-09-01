@@ -49,7 +49,7 @@
         "
         @click="onLoginClick"
       />
-      <q-btn
+      <!-- <q-btn
         no-caps
         flat
         color="black"
@@ -62,7 +62,7 @@
           bttns-home
           q-mt-sm
         "
-      />
+      /> -->
     </div>
   </q-page>
 </template>
@@ -72,7 +72,7 @@ import { defineComponent, ref } from "vue";
 import { useUser } from "../lib/useUser";
 import { showToast } from "../lib/useToast";
 import { useQuasar } from "quasar";
-import {useRouter} from 'vue-router'
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "PageSignIn",
@@ -87,16 +87,20 @@ export default defineComponent({
     const router = useRouter();
 
     const onLoginClick = async () => {
-      try {
-        const { error } = await login(email.value, password.value);
-        if (error) {
+      if (email.value === "" || password.value === "") {
+        showToast({ type: "negative", message: "Câmp gol!" });
+      } else {
+        try {
+          const { error } = await login(email.value, password.value);
+          if (error) {
+            showToast({ type: "negative", message: error });
+            return;
+          }
+          showToast({ type: "positive", message: "Logged in" });
+          router.push("/");
+        } catch (error) {
           showToast({ type: "negative", message: error });
-          return;
         }
-        showToast({type: 'positive', message: 'Logged in'})
-        router.push('/')
-      } catch (error) {
-        showToast({ type: "negative", message: error });
       }
     };
 
