@@ -114,7 +114,7 @@
           @click="toggleRightDrawer"
           class="q-ml-sm q-mr-xl"
         >
-          <q-badge color="black" floating rounded>4 </q-badge>
+          <q-badge color="black" floating rounded>{{cartState.cartProducts.length}} </q-badge>
         </q-btn>
       </q-toolbar>
     </q-header>
@@ -123,8 +123,8 @@
       <q-scroll-area style="height: calc(100% - 300px); margin-bottom: 300px">
         <q-list separator bordered>
           <cart-item-component
-            v-for="product in cartProducts"
-            :product="product"
+            v-for="product in cartState.cartProducts"
+            :cartProduct="product"
             :key="product.id"
           />
         </q-list>
@@ -244,7 +244,8 @@
 import { Cookies } from "quasar";
 import { defineComponent, ref, onMounted } from "vue";
 import CartItemComponent from "../components/CartItemComponent.vue";
-import { CartProduct } from "../components/models";
+import { CartProduct } from "../lib/models/CartProduct";
+import {useCart} from "../lib/useCart"
 import { useUser } from "../lib/useUser";
 
 export default defineComponent({
@@ -254,25 +255,8 @@ export default defineComponent({
 
   setup() {
     const { state: userState, getUserDetails, logout } = useUser();
-
-    const cartProducts = ref<CartProduct[]>([
-      {
-        id: 1,
-        name: "BE HAPPY T-SHIRT",
-        price: 40,
-        image: require("../assets/t-behappy2.jpg"),
-        size: "M",
-        quantity: 1,
-      },
-      {
-        id: 2,
-        name: "QUARANTINI T-SHIRT",
-        price: 150,
-        image: require("../assets/t-quarantini2.jpg"),
-        size: "M",
-        quantity: 3,
-      },
-    ]);
+    const {state: cartState} = useCart();
+   
 
     const rightDrawerOpen = ref(false);
     const discountCode = ref("");
@@ -285,7 +269,7 @@ export default defineComponent({
 
     return {
       CartItemComponent,
-      cartProducts,
+      cartState,
       discountCode,
       rightDrawerOpen,
       userState,
