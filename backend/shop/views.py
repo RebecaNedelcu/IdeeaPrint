@@ -94,3 +94,12 @@ def get_product_details(request, product_id):
     serialized_data = ProductDetailsSerializer(product_details, many=True)
 
     return Response(serialized_data.data)
+
+
+@api_view(['GET'])
+@permission_classes([])
+def get_products_by_type(request, product_type):
+    product = Product.objects.filter(type=product_type)
+    serialized_data = ProductSerializer(product, many=True, context={'request': request})
+
+    return Response(serialized_data.data)

@@ -1,4 +1,4 @@
-import { Product } from "src/components/models";
+import { Product } from "./models/Product";
 import { reactive } from "vue";
 import { ProductDetails } from "./types/ApiResponses";
 import { useApi } from "./useApi";
@@ -12,12 +12,12 @@ const state = reactive<stateType>({
 });
 
 export const useProducts = () => {
-  const changePrice = (id: number) => {
-    const product = state.products.find((product) => product.id === id);
-    if (product) {
-      product.price = 100;
-    }
-  };
+  // const changePrice = (id: number) => {
+  //   const product = state.products.find((product) => product.id === id);
+  //   if (product) {
+  //     product.price = 100;
+  //   }
+  // };
 
   const loadProducts = async () => {
     try {
@@ -45,5 +45,15 @@ export const useProducts = () => {
     } catch (error) {}
   };
 
-  return { state, changePrice, loadProducts, getProductDetails };
+  const getProductsByType = async (productsType: number) => {
+    try {
+      const { data } = await useApi<Product[]>({
+        url: `shop/get_products_by_type/${productsType}`,
+      });
+
+      return data;
+    } catch (error) {}
+  };
+
+  return { state, loadProducts, getProductDetails,getProductsByType };
 };
