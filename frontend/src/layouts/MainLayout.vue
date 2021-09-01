@@ -114,7 +114,9 @@
           @click="toggleRightDrawer"
           class="q-ml-sm q-mr-xl"
         >
-          <q-badge color="black" floating rounded>{{cartState.cartProducts.length}} </q-badge>
+          <q-badge color="black" floating rounded
+            >{{ cartState.cartProducts.length }}
+          </q-badge>
         </q-btn>
       </q-toolbar>
     </q-header>
@@ -143,15 +145,15 @@
       >
         <div class="row justify-between">
           <span>SUBTOTAL</span>
-          <span>190 LEI</span>
+          <span>{{ subtotal }} LEI</span>
         </div>
         <div class="row justify-between">
           <span>DELIVERY</span>
-          <span>25 LEI</span>
+          <span>{{ delivery }} LEI</span>
         </div>
         <div class="row justify-between">
           <span>DISCOUNT</span>
-          <span>-47,5 LEI</span>
+          <span>-{{ discount }} LEI</span>
         </div>
         <div class="q-px-lg">
           <q-input
@@ -164,7 +166,7 @@
         </div>
         <div class="row justify-between text-h6 text-bold q-py-sm">
           <span>TOTAL</span>
-          <span>167,5 LEI</span>
+          <span>{{ total }} LEI</span>
         </div>
         <div class="row q-mb-lg">
           <q-btn
@@ -175,6 +177,7 @@
             size="md"
             v-close-popup
             class="no-border-radius discountButton text-bold q-px-lg col"
+            @click="applyDiscount"
           />
           <q-btn
             flat
@@ -184,6 +187,7 @@
             size="md"
             v-close-popup
             class="no-border-radius checkoutButton text-bold q-px-lg col"
+            to="/checkout"
           />
         </div>
       </div>
@@ -242,10 +246,10 @@
 
 <script lang="ts">
 import { Cookies } from "quasar";
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted, watch } from "vue";
 import CartItemComponent from "../components/CartItemComponent.vue";
 import { CartProduct } from "../lib/models/CartProduct";
-import {useCart} from "../lib/useCart"
+import { useCart } from "../lib/useCart";
 import { useUser } from "../lib/useUser";
 
 export default defineComponent({
@@ -255,16 +259,57 @@ export default defineComponent({
 
   setup() {
     const { state: userState, getUserDetails, logout } = useUser();
-    const {state: cartState} = useCart();
-   
-
+    const { state: cartState } = useCart();
     const rightDrawerOpen = ref(false);
     const discountCode = ref("");
 
+    let subtotal = ref(0);
+    let total = ref(0);
+    let delivery = ref(25);
+
+    let isDiscountApplied = ref(false);
+    let discount = ref(0);
+
+    const updateProductsSummary = () => {
+      subtotal.value = 0;
+      cartState.cartProducts.forEach((cartProduct) => {
+        subtotal.value += cartProduct.quantity * parseInt(cartProduct.price);
+      });
+      if (isDiscountApplied.value) {
+        discount.value = (subtotal.value * 30) / 100;
+        subtotal.value -= discount.value;
+      }
+      if (subtotal.value > 299) {
+        delivery.value = 0;
+      } else {
+        delivery.value = 25;
+      }
+      if (subtotal.value > 0) {
+        total.value = subtotal.value + delivery.value;
+      } else {
+        total.value = 0;
+      }
+      if (cartState.cartProducts.length === 0) {
+        total.value = 0;
+      }
+    };
+    watch(cartState.cartProducts, updateProductsSummary);
+
+    const applyDiscount = () => {
+      if (!isDiscountApplied.value) {
+        {
+          if (discountCode.value === "ideeaprint30") {
+            isDiscountApplied.value = true;
+            updateProductsSummary();
+          }
+        }
+      }
+    };
     onMounted(async () => {
       if (Cookies.has("access_token")) {
         await getUserDetails();
       }
+      updateProductsSummary();
     });
 
     return {
@@ -277,6 +322,11 @@ export default defineComponent({
       toggleRightDrawer() {
         rightDrawerOpen.value = !rightDrawerOpen.value;
       },
+      subtotal,
+      total,
+      delivery,
+      applyDiscount,
+      discount,
     };
   },
 });
