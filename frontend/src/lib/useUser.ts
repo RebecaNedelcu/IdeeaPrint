@@ -64,7 +64,7 @@ export const useUser = () => {
   };
 
   const setUserWithDetails = (data: ApiUserDetails | undefined) => {
-    if (data) {
+    if (data && data.user) {
       state.user.email = data.user.email;
       state.user.firstName = data.user.first_name;
       state.user.lastName = data.user.last_name;
