@@ -115,6 +115,8 @@ class OrderProducts(models.Model):
     product = models.ForeignKey(ProductDetails, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
+    illustration = models.ForeignKey(Illustration, on_delete=models.CASCADE, blank=True, null=True)
+    illustration_from_user = models.ImageField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.product} in {self.order}"
