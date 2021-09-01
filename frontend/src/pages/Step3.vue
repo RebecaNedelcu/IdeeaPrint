@@ -503,6 +503,7 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { useCart } from "../lib/useCart";
 import { useRouter, useRoute } from "vue-router";
 import { showToast } from "../lib/useToast";
+import { Size } from "../components/models";
 
 export default defineComponent({
   name: "DesignStep3",
@@ -948,7 +949,7 @@ export default defineComponent({
 
     const { addCartProduct } = useCart();
 
-    let sizes = [];
+    let sizes:String[] = [];
     sizes.push(route.params.size.toString());
     const addProductToCart = () => {
       // if (selectedProductIllustration.value) {
@@ -960,8 +961,8 @@ export default defineComponent({
         1,
         route.params.price.toString(),
         route.params.name.toString(),
-        sizes,
-        route.params.size.toString(),
+        [],
+        route.params.size as unknown as Size,
         previewImage.value
       );
       //   } else {
